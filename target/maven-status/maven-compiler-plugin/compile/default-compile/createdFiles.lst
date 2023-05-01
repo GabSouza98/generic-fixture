@@ -1,0 +1,6 @@
+domain\Dummy$DummyBuilder.class
+Main.class
+domain\Dummy.class
+domain\ComplexType.class
+domain\ComplexType$ComplexTypeBuilder.class
+GenericFixture.class
