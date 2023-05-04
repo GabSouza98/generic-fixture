@@ -55,9 +55,14 @@ public class GenericFixture {
                     field.set(type, OffsetDateTime.now());
                 }
 
+                //Here we can identify what types are not POJOs
                 if (!fieldType.getPackageName().startsWith("java")) {
-                    //Here we can identify what types are not POJOs
-                    field.set(type, generate(fieldType));
+
+                    if (fieldType.isEnum()) {
+                        field.set(type, fieldType.getEnumConstants()[0]);
+                    } else {
+                        field.set(type, generate(fieldType));
+                    }
                 }
 
                 if (fieldType == List.class) {

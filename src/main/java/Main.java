@@ -1,4 +1,5 @@
 import domain.Dummy;
+import enums.CustomEnum;
 
 public class Main {
 

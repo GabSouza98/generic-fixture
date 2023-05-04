@@ -1,5 +1,6 @@
 package domain;
 
+import enums.CustomEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,6 @@ import java.util.List;
 public class Dummy {
 
     private int primitiveInt;
-
     private String String;
     private Long Long;
     private Integer Integer;
@@ -24,9 +24,10 @@ public class Dummy {
     private OffsetDateTime OffsetDateTime;
     private ComplexType ComplexType;
     private List<ComplexType> list;
+    private CustomEnum CustomEnum;
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return "Dummy {\n" +
                 "    primetiveInt=" + primitiveInt +  "\n" +
                 "    String=" + String + "\n" +
@@ -37,6 +38,7 @@ public class Dummy {
                 "    LocalDateTime=" + LocalDateTime +"\n" +
                 "    OffsetDateTime=" + OffsetDateTime +"\n" +
                 "    ComplexType=" + ComplexType +"\n" +
+                "    CustomEnum=" + CustomEnum +"\n" +
                 "    List=" + list + "\n" +
                 "    }";
     }
