@@ -13,11 +13,11 @@ public class GenericFixture {
 
     static Random r = new Random();
 
-    public static <T> T generate(Class<T> generic) throws Exception {
+    public static <T> T generate(Class<T> clazz) throws Exception {
 
         try {
 
-            T type = generic.getDeclaredConstructor().newInstance();
+            T type = clazz.getDeclaredConstructor().newInstance();
 
             Field[] fields = type.getClass().getDeclaredFields();
 
@@ -56,7 +56,7 @@ public class GenericFixture {
                 }
 
                 //Here we can identify what types are not POJOs
-                if (!fieldType.getPackageName().startsWith("java")) {
+                if (isComplexField(fieldType)) {
 
                     if (fieldType.isEnum()) {
                         field.set(type, fieldType.getEnumConstants()[0]);
@@ -93,6 +93,10 @@ public class GenericFixture {
             System.out.println(e.getMessage());
             throw e;
         }
+    }
+
+    private static boolean isComplexField(Class<?> fieldType) {
+        return !fieldType.getPackageName().startsWith("java");
     }
 
     private static Object getRandomForType(Class<?> innerClass) throws Exception {
