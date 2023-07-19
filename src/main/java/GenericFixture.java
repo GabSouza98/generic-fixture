@@ -1,13 +1,17 @@
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class GenericFixture {
 
@@ -21,7 +25,12 @@ public class GenericFixture {
 
             Field[] fields = type.getClass().getDeclaredFields();
 
-            for (Field field : fields) {
+            var fieldsList = Arrays.stream(fields)
+                    .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                    .filter(f -> !Modifier.isFinal(f.getModifiers()))
+                    .collect(Collectors.toList());
+
+            for (Field field : fieldsList) {
 
                 field.setAccessible(true);
 
@@ -55,6 +64,10 @@ public class GenericFixture {
                     field.set(type, OffsetDateTime.now());
                 }
 
+                if (fieldType == Instant.class) {
+                    field.set(type, Instant.now());
+                }
+
                 //Here we can identify what types are not POJOs
                 if (isComplexField(fieldType)) {
 
@@ -76,11 +89,7 @@ public class GenericFixture {
 
                     //Controls how many random items are going to be inside List attribute
                     for (int i = 0; i < 1; i++) {
-                        if (innerClass.getPackageName().startsWith("java")) {
-                            innerClassFixture = getRandomForType(innerClass);
-                        } else {
-                            innerClassFixture = generate(innerClass);
-                        }
+                        innerClassFixture = generate(innerClass);
                         list.add(innerClassFixture);
                     }
                     field.set(type, list);
@@ -98,40 +107,4 @@ public class GenericFixture {
     private static boolean isComplexField(Class<?> fieldType) {
         return !fieldType.getPackageName().startsWith("java");
     }
-
-    private static Object getRandomForType(Class<?> innerClass) throws Exception {
-
-        if (innerClass == String.class) {
-            return RandomStringUtils.randomAlphanumeric(10);
-        }
-
-        if (innerClass == Long.class || innerClass == long.class) {
-            return r.nextLong(10);
-        }
-
-        if (innerClass == Integer.class || innerClass == int.class) {
-            return r.nextInt(10);
-        }
-
-        if (innerClass == Double.class || innerClass == double.class) {
-            return r.nextDouble(10);
-        }
-
-        if (innerClass == Boolean.class || innerClass == boolean.class) {
-            return r.nextBoolean();
-        }
-
-        if (innerClass == LocalDateTime.class) {
-            return LocalDateTime.now();
-        }
-
-        if (innerClass == OffsetDateTime.class) {
-            return OffsetDateTime.now();
-        }
-
-        throw new Exception("Unrecongnized type");
-
-    }
-
-
 }
