@@ -7,11 +7,10 @@ import java.lang.reflect.Type;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 public class GenericFixture {
 
@@ -25,7 +24,7 @@ public class GenericFixture {
 
             Field[] fields = type.getClass().getDeclaredFields();
 
-            var fieldsList = Arrays.stream(fields)
+            List<Field> fieldsList = Arrays.stream(fields)
                     .filter(f -> !Modifier.isStatic(f.getModifiers()))
                     .filter(f -> !Modifier.isFinal(f.getModifiers()))
                     .collect(Collectors.toList());
@@ -41,7 +40,7 @@ public class GenericFixture {
                 }
 
                 if (fieldType == Long.class || fieldType == long.class) {
-                    field.set(type, r.nextLong(10));
+                    field.set(type, r.nextLong());
                 }
 
                 if (fieldType == Integer.class || fieldType == int.class) {
@@ -49,7 +48,7 @@ public class GenericFixture {
                 }
 
                 if (fieldType == Double.class || fieldType == double.class) {
-                    field.set(type, r.nextDouble(10));
+                    field.set(type, r.nextDouble());
                 }
 
                 if (fieldType == Boolean.class || fieldType == boolean.class) {
@@ -105,6 +104,9 @@ public class GenericFixture {
     }
 
     private static boolean isComplexField(Class<?> fieldType) {
-        return !fieldType.getPackageName().startsWith("java");
+        if(nonNull(fieldType.getPackage()))
+            return !fieldType.getPackage().getName().startsWith("java");
+
+        return false;
     }
 }

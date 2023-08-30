@@ -7,8 +7,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="GenericFixture" />
+        <module name="generic-fixture" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="GenericFixture" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
