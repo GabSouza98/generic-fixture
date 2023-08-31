@@ -1,25 +1,34 @@
+import com.github.curiousoddman.rgxgen.RgxGen;
+import enums.AnnotationsEnum;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import static enums.AnnotationsEnum.PATTERN;
+import static enums.AnnotationsEnum.SIZE;
 import static java.util.Objects.nonNull;
 
 public class GenericFixture {
 
-    static Random r = new Random();
+    static SecureRandom r = new SecureRandom();
 
     public static <T> T generate(Class<T> clazz) throws Exception {
 
         try {
-
             T type = clazz.getDeclaredConstructor().newInstance();
 
             Field[] fields = type.getClass().getDeclaredFields();
@@ -35,8 +44,44 @@ public class GenericFixture {
 
                 Class<?> fieldType = field.getType();
 
+                HashMap<AnnotationsEnum, Annotation> hashMap = new HashMap<>();
+
+                for (Annotation annotation : field.getAnnotations()) {
+                    if (annotation instanceof jakarta.validation.constraints.Pattern) {
+                        hashMap.put(PATTERN, annotation);
+                    }
+                    if (annotation instanceof jakarta.validation.constraints.Size) {
+                        hashMap.put(AnnotationsEnum.SIZE, annotation);
+                    }
+                }
+
                 if (fieldType == String.class) {
-                    field.set(type, RandomStringUtils.randomAlphanumeric(10));
+
+                    String s = RandomStringUtils.randomAlphanumeric(10);
+
+                    if (hashMap.containsKey(PATTERN)) {
+                        s = new RgxGen(((Pattern) hashMap.get(PATTERN)).regexp()).generate();
+                    }
+
+                    if (hashMap.containsKey(SIZE)) {
+                        Size size = (Size) hashMap.get(SIZE);
+                        int max = limitateDefaultMaxValue(size);
+                        s = RandomStringUtils.randomAlphanumeric(size.min(), max);
+                    }
+
+                    //original
+//                    Pattern pattern = field.getAnnotation(jakarta.validation.constraints.Pattern.class);
+//                    if (nonNull(pattern)) {
+//                        s = new RgxGen(pattern.regexp()).generate();
+//                    }
+
+//                    Size size = field.getAnnotation(jakarta.validation.constraints.Size.class);
+//                    if (nonNull(size)) {
+//                        int max = limitateDefaultMaxValue(size);
+//                        s = RandomStringUtils.randomAlphanumeric(size.min(), max);
+//                    }
+
+                    field.set(type, s);
                 }
 
                 if (fieldType == Long.class || fieldType == long.class) {
@@ -65,6 +110,10 @@ public class GenericFixture {
 
                 if (fieldType == Instant.class) {
                     field.set(type, Instant.now());
+                }
+
+                if (fieldType == UUID.class) {
+                    field.set(type, UUID.randomUUID());
                 }
 
                 //Here we can identify what types are not POJOs
@@ -108,5 +157,9 @@ public class GenericFixture {
             return !fieldType.getPackage().getName().startsWith("java");
 
         return false;
+    }
+
+    private static int limitateDefaultMaxValue(Size size) {
+        return size.max() == Integer.MAX_VALUE ? size.min() : size.max();
     }
 }

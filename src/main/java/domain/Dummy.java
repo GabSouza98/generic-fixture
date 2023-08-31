@@ -1,6 +1,10 @@
 package domain;
 
 import enums.CustomEnum;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,6 +16,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Dummy {
 
     private int primitiveInt;
@@ -26,20 +31,23 @@ public class Dummy {
     private List<ComplexType> list;
     private CustomEnum CustomEnum;
 
-    @Override
-    public String toString() {
-        return "Dummy {\n" +
-                "    primetiveInt=" + primitiveInt +  "\n" +
-                "    String=" + String + "\n" +
-                "    Long=" + Long + "\n" +
-                "    Integer=" + Integer +"\n" +
-                "    Double=" + Double +"\n" +
-                "    Boolean=" + Boolean +"\n" +
-                "    LocalDateTime=" + LocalDateTime +"\n" +
-                "    OffsetDateTime=" + OffsetDateTime +"\n" +
-                "    ComplexType=" + ComplexType +"\n" +
-                "    CustomEnum=" + CustomEnum +"\n" +
-                "    List=" + list + "\n" +
-                "    }";
-    }
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$")
+    private String stringWithDateFormat;
+
+    @Size(min = 3)
+    private String minimumString;
+
+    @Size(max = 6)
+    private String maximumString;
+
+    @Size(min = 4, max = 9)
+    private String mediumString;
+
+    //TODO
+//    @Min(2)
+//    private Integer minInteger;
+//
+//    @Max(10)
+//    private Integer maxInteger;
+
 }
