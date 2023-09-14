@@ -1,6 +1,5 @@
 import com.github.curiousoddman.rgxgen.RgxGen;
 import enums.AnnotationsEnum;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -15,7 +14,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static enums.AnnotationsEnum.PATTERN;
@@ -68,18 +66,6 @@ public class GenericFixture {
                         int max = limitateDefaultMaxValue(size);
                         s = RandomStringUtils.randomAlphanumeric(size.min(), max);
                     }
-
-                    //original
-//                    Pattern pattern = field.getAnnotation(jakarta.validation.constraints.Pattern.class);
-//                    if (nonNull(pattern)) {
-//                        s = new RgxGen(pattern.regexp()).generate();
-//                    }
-
-//                    Size size = field.getAnnotation(jakarta.validation.constraints.Size.class);
-//                    if (nonNull(size)) {
-//                        int max = limitateDefaultMaxValue(size);
-//                        s = RandomStringUtils.randomAlphanumeric(size.min(), max);
-//                    }
 
                     field.set(type, s);
                 }
@@ -142,6 +128,23 @@ public class GenericFixture {
                     }
                     field.set(type, list);
                 }
+
+                if (fieldType == Map.class) {
+                    ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+                    Type innerTypeKey = parameterizedType.getActualTypeArguments()[0];
+                    Type innerTypeValue = parameterizedType.getActualTypeArguments()[1];
+
+                    Class<?> innerClassKey = Class.forName(innerTypeKey.getTypeName());
+                    Class<?> innerClassValue = Class.forName(innerTypeValue.getTypeName());
+
+                    Map<Object, Object> map = new HashMap<>();
+
+                    map.put(generate(innerClassKey), generate(innerClassValue));
+
+                    field.set(type, map);
+
+                }
+
             }
 
             return type;
