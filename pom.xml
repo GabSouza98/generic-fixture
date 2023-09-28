@@ -144,6 +144,15 @@
             <artifactId>rgxgen</artifactId>
             <version>1.4</version>
         </dependency>
+
+        <!--Testes -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>3.1.4</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>
 
