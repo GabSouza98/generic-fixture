@@ -21,6 +21,9 @@ import java.util.Map;
 @ToString
 public class Dummy {
 
+    private static String stringEstatica = "minha string estatica";
+    private final String constante = "CONSTANTE";
+
     private int primitiveInt;
     private String String;
     private Long Long;
@@ -47,10 +50,10 @@ public class Dummy {
     private String mediumString;
 
     //TODO
-//    @Min(2)
-//    private Integer minInteger;
-//
-//    @Max(10)
-//    private Integer maxInteger;
+    @Min(2)
+    private Integer minInteger;
+
+    @Max(10)
+    private Integer maxInteger;
 
 }
