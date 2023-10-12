@@ -1,4 +1,6 @@
 import domain.Dummy;
+import domain.DummyWithArgsContructors;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +18,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldValidateAllFields() throws Exception {
+    void shouldValidateAllFields() {
         assertTrue(dummy.getPrimitiveInt() != 0, "Erro para o tipo int");
         assertNotNull(dummy.getString(), "Erro para o tipo String");
         assertNotNull(dummy.getInteger(), "Erro para o tipo Integer");
@@ -24,21 +26,33 @@ class GenericFixtureTest {
         assertNotNull(dummy.getLocalDateTime(), "Erro para o tipo LocalDateTime");
         assertNotNull(dummy.getOffsetDateTime(), "Erro para o tipo OffsetDateTime");
         assertNotNull(dummy.getComplexType(), "Erro para o tipo ComplexType");
-        assertNotNull(dummy.getList(), "Erro para o tipo List");
-        assertNotNull(dummy.getList().get(0), "Erro para inserir registro na lista");
+        assertNotNull(dummy.getComplexList(), "Erro para o tipo complexList");
+        assertNotNull(dummy.getComplexList().get(0), "Erro para inserir registro na complexList");
+        assertNotNull(dummy.getIntegerList(), "Erro para o tipo integerList");
+        assertNotNull(dummy.getDoubleList(), "Erro para o tipo doubleList");
+        assertNotNull(dummy.getStringList(), "Erro para o tipo stringList");
+        assertNotNull(dummy.getCharList(), "Erro para o tipo charList");
+        assertNotNull(dummy.getBooleanList(), "Erro para o tipo booleanList");
         assertNotNull(dummy.getCustomEnum(), "Erro para o tipo CustomEnum");
-        assertNotNull(dummy.getCustomMap(), "Erro para o tipo CustomMap");
-        assertEquals(1, dummy.getCustomMap().size(), "Erro para inserir no CustomMap");
+        assertNotNull(dummy.getStringMap(), "Erro para o tipo stringMap");
+        assertNotNull(dummy.getIntegerMap(), "Erro para o tipo integerMap");
+        assertNotNull(dummy.getMixedMap(), "Erro para o tipo mixedMap");
+        assertNotNull(dummy.getComplexTypeMap(), "Erro para o tipo complexMap");
+        assertEquals(1, dummy.getStringMap().size(), "Erro para inserir no CustomMap");
     }
 
     @Test
-    void shouldTestFieldWithAnnotations() throws Exception {
-
+    void shouldTestFieldWithAnnotations() {
         assertTrue(Pattern.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$", dummy.getStringWithDateFormat()), "Erro para formatar no pattern");
         assertTrue(dummy.getMinimumString().length() >= 3, "Erro para a anotação Size(min)");
         assertTrue(dummy.getMaximumString().length() <= 6, "Erro para a anotação Size(max)");
         assertTrue(dummy.getMediumString().length() >= 4, "Erro para a anotação Size(min, max)");
         assertTrue(dummy.getMediumString().length() <= 9, "Erro para a anotação Size(min, max)");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDoesntHasNoArgsConstructor() {
+        assertThrows(Exception.class, () -> GenericFixture.generate(DummyWithArgsContructors.class));
     }
 
 }

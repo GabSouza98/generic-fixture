@@ -9,7 +9,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +32,17 @@ public class Dummy {
     private LocalDateTime LocalDateTime;
     private OffsetDateTime OffsetDateTime;
     private ComplexType ComplexType;
-    private List<ComplexType> list;
+    private List<ComplexType> complexList;
+    private List<Integer> integerList;
+    private List<Double> doubleList;
+    private List<String> stringList;
+    private List<Character> charList;
+    private List<Boolean> booleanList;
     private CustomEnum CustomEnum;
-    private Map<String, String> customMap;
+    private Map<String, String> stringMap;
+    private Map<Integer, Integer> integerMap;
+    private Map<Integer, String> mixedMap;
+    private Map<Integer, ComplexType> complexTypeMap;
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$")
     private String stringWithDateFormat;

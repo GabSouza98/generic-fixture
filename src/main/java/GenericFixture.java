@@ -5,10 +5,7 @@ import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -28,17 +25,19 @@ public class GenericFixture {
 
         try {
 
+            if (!hasNoArgsConstructor(clazz)) {
+                throw new Exception("A classe precisa ter um construtor vazio");
+            }
+
             T type = clazz.getDeclaredConstructor().newInstance();
-
             Field[] fields = type.getClass().getDeclaredFields();
-
             List<Field> fieldsList = ignoreFinalFields(fields);
 
             for (Field field : fieldsList) {
                 field.setAccessible(true);
 
                 Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                Object result = getRandomForType(field, map);
+                Object result = getRandomForType(field.getType(), field.getGenericType(), map);
 
                 field.set(type, result);
             }
@@ -73,21 +72,13 @@ public class GenericFixture {
         return hashMap;
     }
 
-    private static boolean isComplexField(Class<?> fieldType) {
-        if(nonNull(fieldType.getPackage()))
-            return !fieldType.getPackage().getName().startsWith("java");
-
-        return false;
-    }
-
     private static int limitateDefaultMaxValue(Size size) {
         return size.max() == Integer.MAX_VALUE ? size.min() : size.max();
     }
 
-    private static Object getRandomForType(Field field,
+    private static Object getRandomForType(Class<?> fieldType,
+                                           Type type,
                                            Map<AnnotationsEnum, Annotation> hashMap) throws Exception {
-
-        Class<?> fieldType = field.getType();
 
         if (fieldType == String.class) {
             String string = RandomStringUtils.randomAlphanumeric(10);
@@ -122,6 +113,10 @@ public class GenericFixture {
             return r.nextBoolean();
         }
 
+        if (fieldType == Character.class || fieldType == char.class) {
+            return RandomStringUtils.randomAlphabetic(1).charAt(0);
+        }
+
         if (fieldType == LocalDateTime.class) {
             return LocalDateTime.now();
         }
@@ -139,7 +134,7 @@ public class GenericFixture {
         }
 
         //Here we can identify what types are not POJOs
-        if (isComplexField(fieldType)) {
+        if (isComplexClass(fieldType)) {
             if (fieldType.isEnum()) {
                 return fieldType.getEnumConstants()[0];
             } else {
@@ -148,36 +143,68 @@ public class GenericFixture {
         }
 
         if (fieldType == List.class) {
-            //If the field is a List, we need to get the generic type
-            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-            Type innerType = parameterizedType.getActualTypeArguments()[0];
-            Class<?> innerClass = Class.forName(innerType.getTypeName()); //Fully qualified name
-
+            Class<?>[] innerClasses = getInnerClasses(type);
             List<Object> list = new ArrayList<>();
-            Object innerClassFixture;
 
-            //Controls how many random items are going to be inside List attribute
+            Object obj = getObjectByClass(innerClasses[0]);
+
             for (int i = 0; i < 1; i++) {
-                innerClassFixture = generate(innerClass);
-                list.add(innerClassFixture);
+                list.add(obj);
             }
             return list;
         }
 
         if (fieldType == Map.class) {
-            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-            Type innerTypeKey = parameterizedType.getActualTypeArguments()[0];
-            Type innerTypeValue = parameterizedType.getActualTypeArguments()[1];
-
-            Class<?> innerClassKey = Class.forName(innerTypeKey.getTypeName());
-            Class<?> innerClassValue = Class.forName(innerTypeValue.getTypeName());
-
+            Class<?>[] innerClasses = getInnerClasses(type);
             Map<Object, Object> map = new HashMap<>();
 
-            map.put(generate(innerClassKey), generate(innerClassValue));
+            Object key = getObjectByClass(innerClasses[0]);
+            Object value = getObjectByClass(innerClasses[1]);
+
+            map.put(key, value);
             return map;
         }
 
         throw new Exception("Type not recognized: ".concat(fieldType.getTypeName()));
+    }
+
+    private static boolean hasNoArgsConstructor(Class<?> clazz) {
+        Constructor<?>[] constructors = clazz.getConstructors();
+        for(Constructor<?> c: constructors) {
+            if (c.getParameterCount() == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Object getObjectByClass(Class<?> innerClass) throws Exception {
+        return isComplexClass(innerClass) ?
+                generate(innerClass) :
+                getRandomForType(innerClass, null, new HashMap<>());
+    }
+
+    private static boolean isComplexClass(Class<?> clazz) {
+        if(nonNull(clazz.getPackage())) {
+            return !clazz.getPackage().getName().startsWith("java");
+        }
+
+        return false;
+    }
+
+    private static Class<?>[] getInnerClasses(Type type) throws ClassNotFoundException {
+        //If the field has generics, we need to get the generic types
+        ParameterizedType parameterizedType = (ParameterizedType) type;
+        //Generic types, like List<T> or Map<K, V>
+        Type[] types = parameterizedType.getActualTypeArguments();
+
+        Class<?>[] innerClasses = new Class<?>[types.length];
+        for (int i=0; i<types.length; i++) {
+            Type t = types[i];
+            Class<?> innerClass = Class.forName(t.getTypeName()); //Fully qualified name
+            innerClasses[i] = innerClass;
+        }
+
+        return innerClasses;
     }
 }
