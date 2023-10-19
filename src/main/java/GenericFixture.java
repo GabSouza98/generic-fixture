@@ -1,5 +1,5 @@
 import com.github.curiousoddman.rgxgen.RgxGen;
-import domain.UpdateIgnoreFields;
+import exceptions.NoArgsConstructorException;
 import enums.AnnotationsEnum;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -17,26 +17,52 @@ import java.util.stream.Collectors;
 import static enums.AnnotationsEnum.PATTERN;
 import static enums.AnnotationsEnum.SIZE;
 import static java.util.Objects.nonNull;
+import static utils.UpdateIgnoredFields.update;
 
 public class GenericFixture {
 
     static SecureRandom r = new SecureRandom();
 
+    private static List<String> ignoredFields = new ArrayList<>();
+
+    public static <T> T generate(Class<T> clazz) throws Exception {
+        return doGenerate(clazz);
+    }
+
     public static <T> T generate(Class<T> clazz, List<String> ignoredFields) throws Exception {
+        GenericFixture.ignoredFields = ignoredFields;
+        return doGenerate(clazz);
+    }
+
+    public static <T> T doGenerate(Class<T> clazz) throws Exception {
 
         try {
 
             if (!hasNoArgsConstructor(clazz)) {
-                throw new Exception("A classe precisa ter um construtor vazio");
+                throw new NoArgsConstructorException();
             }
 
             T type = clazz.getDeclaredConstructor().newInstance();
             Field[] fields = type.getClass().getDeclaredFields();
-            List<Field> fieldsList = ignoreFinalFields(fields, ignoredFields);
-            ignoredFields = UpdateIgnoreFields.update(ignoredFields);
+            List<Field> fieldsList = ignoreFinalFields(fields);
 
             for (Field field : fieldsList) {
                 field.setAccessible(true);
+
+                String fieldName = field.getName();
+
+                if (containsIgnorableField(fieldName)) {
+                    //This means that this field is part of the hierarchy to an ignorable field
+                    if (isDeepestField(fieldName)) {
+                        //This means that this field is the last in the hierarchy,
+                        //so we have to remove it from the list and also ignore it
+                        ignoredFields = update(ignoredFields, fieldName);
+                        continue;
+                    } else {
+                        //Updates the ignorable fields hierarchy
+                        ignoredFields = update(ignoredFields, fieldName);
+                    }
+                }
 
                 Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
                 Object result = getRandomForType(field.getType(), field.getGenericType(), map, ignoredFields);
@@ -52,47 +78,21 @@ public class GenericFixture {
         }
     }
 
-//    public static <T> T generate(Class<T> clazz) throws Exception {
-//
-//        try {
-//
-//            if (!hasNoArgsConstructor(clazz)) {
-//                throw new Exception("A classe precisa ter um construtor vazio");
-//            }
-//
-//            T type = clazz.getDeclaredConstructor().newInstance();
-//            Field[] fields = type.getClass().getDeclaredFields();
-//            List<Field> fieldsList = ignoreFinalFields(fields);
-//
-//            for (Field field : fieldsList) {
-//                field.setAccessible(true);
-//
-//                Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-//                Object result = getRandomForType(field.getType(), field.getGenericType(), map, null);
-//
-//                field.set(type, result);
-//            }
-//
-//            return type;
-//
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            throw e;
-//        }
-//    }
-
     private static List<Field> ignoreFinalFields(Field[] fields) {
         return Arrays.stream(fields)
                 .filter(f -> !Modifier.isFinal(f.getModifiers()))
-//                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                .filter(f -> !Modifier.isStatic(f.getModifiers()))
                 .collect(Collectors.toList());
     }
-    private static List<Field> ignoreFinalFields(Field[] fields, List<String> ignoredFields) {
-        return Arrays.stream(fields)
-                .filter(f -> !Modifier.isFinal(f.getModifiers()))
-//                .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                .filter(f -> !ignoredFields.contains(f.getName()))
-                .collect(Collectors.toList());
+
+    private static boolean containsIgnorableField(String fieldName) {
+        //If ignoredFields contains "A.B.C" and fieldName is "A"
+        return !ignoredFields.isEmpty() && ignoredFields.stream().anyMatch(f -> f.startsWith(fieldName));
+    }
+
+    private static boolean isDeepestField(String fieldName) {
+        //If ignoredFields contains "A" and fieldName is exactly "A"
+        return ignoredFields.stream().anyMatch(f -> f.equals(fieldName));
     }
 
     private static HashMap<AnnotationsEnum, Annotation> getAnnotationsMap(Field field) {
