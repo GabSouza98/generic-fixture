@@ -1,4 +1,5 @@
 import com.github.curiousoddman.rgxgen.RgxGen;
+import domain.UpdateIgnoreFields;
 import enums.AnnotationsEnum;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -21,7 +22,7 @@ public class GenericFixture {
 
     static SecureRandom r = new SecureRandom();
 
-    public static <T> T generate(Class<T> clazz) throws Exception {
+    public static <T> T generate(Class<T> clazz, List<String> ignoredFields) throws Exception {
 
         try {
 
@@ -31,13 +32,14 @@ public class GenericFixture {
 
             T type = clazz.getDeclaredConstructor().newInstance();
             Field[] fields = type.getClass().getDeclaredFields();
-            List<Field> fieldsList = ignoreFinalFields(fields);
+            List<Field> fieldsList = ignoreFinalFields(fields, ignoredFields);
+            ignoredFields = UpdateIgnoreFields.update(ignoredFields);
 
             for (Field field : fieldsList) {
                 field.setAccessible(true);
 
                 Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                Object result = getRandomForType(field.getType(), field.getGenericType(), map);
+                Object result = getRandomForType(field.getType(), field.getGenericType(), map, ignoredFields);
 
                 field.set(type, result);
             }
@@ -50,10 +52,46 @@ public class GenericFixture {
         }
     }
 
+//    public static <T> T generate(Class<T> clazz) throws Exception {
+//
+//        try {
+//
+//            if (!hasNoArgsConstructor(clazz)) {
+//                throw new Exception("A classe precisa ter um construtor vazio");
+//            }
+//
+//            T type = clazz.getDeclaredConstructor().newInstance();
+//            Field[] fields = type.getClass().getDeclaredFields();
+//            List<Field> fieldsList = ignoreFinalFields(fields);
+//
+//            for (Field field : fieldsList) {
+//                field.setAccessible(true);
+//
+//                Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
+//                Object result = getRandomForType(field.getType(), field.getGenericType(), map, null);
+//
+//                field.set(type, result);
+//            }
+//
+//            return type;
+//
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//            throw e;
+//        }
+//    }
+
     private static List<Field> ignoreFinalFields(Field[] fields) {
         return Arrays.stream(fields)
                 .filter(f -> !Modifier.isFinal(f.getModifiers()))
 //                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                .collect(Collectors.toList());
+    }
+    private static List<Field> ignoreFinalFields(Field[] fields, List<String> ignoredFields) {
+        return Arrays.stream(fields)
+                .filter(f -> !Modifier.isFinal(f.getModifiers()))
+//                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                .filter(f -> !ignoredFields.contains(f.getName()))
                 .collect(Collectors.toList());
     }
 
@@ -78,7 +116,8 @@ public class GenericFixture {
 
     private static Object getRandomForType(Class<?> fieldType,
                                            Type type,
-                                           Map<AnnotationsEnum, Annotation> hashMap) throws Exception {
+                                           Map<AnnotationsEnum, Annotation> hashMap,
+                                           List<String> ignoredFields) throws Exception {
 
         if (fieldType == String.class) {
             String string = RandomStringUtils.randomAlphanumeric(10);
@@ -138,7 +177,7 @@ public class GenericFixture {
             if (fieldType.isEnum()) {
                 return fieldType.getEnumConstants()[0];
             } else {
-                return generate(fieldType);
+                return generate(fieldType, ignoredFields);
             }
         }
 
@@ -146,7 +185,7 @@ public class GenericFixture {
             Class<?>[] innerClasses = getInnerClasses(type);
             List<Object> list = new ArrayList<>();
 
-            Object obj = getObjectByClass(innerClasses[0]);
+            Object obj = getObjectByClass(innerClasses[0], ignoredFields);
 
             for (int i = 0; i < 1; i++) {
                 list.add(obj);
@@ -158,8 +197,8 @@ public class GenericFixture {
             Class<?>[] innerClasses = getInnerClasses(type);
             Map<Object, Object> map = new HashMap<>();
 
-            Object key = getObjectByClass(innerClasses[0]);
-            Object value = getObjectByClass(innerClasses[1]);
+            Object key = getObjectByClass(innerClasses[0], ignoredFields);
+            Object value = getObjectByClass(innerClasses[1], ignoredFields);
 
             map.put(key, value);
             return map;
@@ -178,10 +217,10 @@ public class GenericFixture {
         return false;
     }
 
-    private static Object getObjectByClass(Class<?> innerClass) throws Exception {
+    private static Object getObjectByClass(Class<?> innerClass, List<String> ignoredFields) throws Exception {
         return isComplexClass(innerClass) ?
-                generate(innerClass) :
-                getRandomForType(innerClass, null, new HashMap<>());
+                generate(innerClass, ignoredFields) :
+                getRandomForType(innerClass, null, new HashMap<>(), null);
     }
 
     private static boolean isComplexClass(Class<?> clazz) {
