@@ -14,6 +14,7 @@ public class ComplexType {
     private Integer Integer;
     private Double Double;
     private Boolean Boolean;
+    private DeepestType DeepestType;
 
     @Override
     public java.lang.String toString() {

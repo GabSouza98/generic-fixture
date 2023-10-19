@@ -162,4 +162,11 @@ class GenericFixtureTest {
         assertNotNull(dummyWithIgnoredFields.getIntegerList().get(0));
     }
 
+    @Test
+    void shouldIgnore_ComplexTypeInteger_Field22() throws Exception {
+        Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, Collections.singletonList("ComplexType.DeepestType.deepest"));
+
+        assertNull(dummyWithIgnoredFields.getComplexType().getDeepestType().getDeepest());
+    }
+
 }

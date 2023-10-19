@@ -26,7 +26,6 @@ public class Dummy {
     private int primitiveInt;
     private String String;
     private Long Long;
-    private Integer Integer;
     private Double Double;
     private Boolean Boolean;
     private LocalDateTime LocalDateTime;
@@ -43,6 +42,7 @@ public class Dummy {
     private Map<Integer, Integer> integerMap;
     private Map<Integer, String> mixedMap;
     private Map<Integer, ComplexType> complexTypeMap;
+    private Integer Integer;
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$")
     private String stringWithDateFormat;

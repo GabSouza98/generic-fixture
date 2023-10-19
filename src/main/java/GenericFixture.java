@@ -1,6 +1,6 @@
 import com.github.curiousoddman.rgxgen.RgxGen;
-import exceptions.NoArgsConstructorException;
 import enums.AnnotationsEnum;
+import exceptions.NoArgsConstructorException;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -17,24 +17,25 @@ import java.util.stream.Collectors;
 import static enums.AnnotationsEnum.PATTERN;
 import static enums.AnnotationsEnum.SIZE;
 import static java.util.Objects.nonNull;
-import static utils.UpdateIgnoredFields.update;
+import static utils.UpdateIgnoredFields.removeItem;
 
 public class GenericFixture {
 
     static SecureRandom r = new SecureRandom();
 
-    private static List<String> ignoredFields = new ArrayList<>();
-
     public static <T> T generate(Class<T> clazz) throws Exception {
-        return doGenerate(clazz);
+        return doGenerate(clazz, new ArrayList<>(), "");
     }
 
     public static <T> T generate(Class<T> clazz, List<String> ignoredFields) throws Exception {
-        GenericFixture.ignoredFields = ignoredFields;
-        return doGenerate(clazz);
+        return doGenerate(clazz, ignoredFields, "");
     }
 
-    public static <T> T doGenerate(Class<T> clazz) throws Exception {
+    private static <T> T generate(Class<T> clazz, List<String> ignoredFields, String attributesPath) throws Exception {
+        return doGenerate(clazz, ignoredFields, attributesPath);
+    }
+
+    public static <T> T doGenerate(Class<T> clazz, List<String> ignoredFields, String attributesPath) throws Exception {
 
         try {
 
@@ -51,21 +52,15 @@ public class GenericFixture {
 
                 String fieldName = field.getName();
 
-                if (containsIgnorableField(fieldName)) {
-                    //This means that this field is part of the hierarchy to an ignorable field
-                    if (isDeepestField(fieldName)) {
-                        //This means that this field is the last in the hierarchy,
-                        //so we have to remove it from the list and also ignore it
-                        ignoredFields = update(ignoredFields, fieldName);
-                        continue;
-                    } else {
-                        //Updates the ignorable fields hierarchy
-                        ignoredFields = update(ignoredFields, fieldName);
-                    }
+                if (isIgnorableField(ignoredFields, fieldName, attributesPath)) {
+                    ignoredFields = removeItem(ignoredFields, fieldName, attributesPath); //This line is optional
+                    continue;
                 }
 
                 Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                Object result = getRandomForType(field.getType(), field.getGenericType(), map, ignoredFields);
+
+                String currentPath = handleAttributesPath(fieldName, attributesPath);
+                Object result = getRandomForType(field.getType(), field.getGenericType(), map, ignoredFields, currentPath);
 
                 field.set(type, result);
             }
@@ -85,14 +80,30 @@ public class GenericFixture {
                 .collect(Collectors.toList());
     }
 
-    private static boolean containsIgnorableField(String fieldName) {
+    private static boolean containsIgnorableField(List<String> ignoredFields, String fieldName) {
         //If ignoredFields contains "A.B.C" and fieldName is "A"
         return !ignoredFields.isEmpty() && ignoredFields.stream().anyMatch(f -> f.startsWith(fieldName));
     }
 
-    private static boolean isDeepestField(String fieldName) {
+    private static boolean isDeepestField(List<String> ignoredFields, String fieldName) {
         //If ignoredFields contains "A" and fieldName is exactly "A"
         return ignoredFields.stream().anyMatch(f -> f.equals(fieldName));
+    }
+
+    private static boolean isIgnorableField(List<String> ignoredFields, String fieldName, String attributesPath) {
+        String currentPath = handleAttributesPath(fieldName, attributesPath);
+
+        //If ignoredFields contains "A.B.C" and currentPath is exactly "A.B.C"
+        return ignoredFields.stream().anyMatch(f -> f.equals(currentPath));
+    }
+
+    public static String handleAttributesPath(String fieldName, String attributesPath) {
+        if (attributesPath.isEmpty()) {
+            //First iteration, no recursion
+            return fieldName;
+        } else {
+            return attributesPath.concat(".").concat(fieldName);
+        }
     }
 
     private static HashMap<AnnotationsEnum, Annotation> getAnnotationsMap(Field field) {
@@ -117,7 +128,8 @@ public class GenericFixture {
     private static Object getRandomForType(Class<?> fieldType,
                                            Type type,
                                            Map<AnnotationsEnum, Annotation> hashMap,
-                                           List<String> ignoredFields) throws Exception {
+                                           List<String> ignoredFields,
+                                           String currentPath) throws Exception {
 
         if (fieldType == String.class) {
             String string = RandomStringUtils.randomAlphanumeric(10);
@@ -177,7 +189,7 @@ public class GenericFixture {
             if (fieldType.isEnum()) {
                 return fieldType.getEnumConstants()[0];
             } else {
-                return generate(fieldType, ignoredFields);
+                return generate(fieldType, ignoredFields, currentPath);
             }
         }
 
@@ -185,7 +197,7 @@ public class GenericFixture {
             Class<?>[] innerClasses = getInnerClasses(type);
             List<Object> list = new ArrayList<>();
 
-            Object obj = getObjectByClass(innerClasses[0], ignoredFields);
+            Object obj = getObjectByClass(innerClasses[0], ignoredFields, currentPath);
 
             for (int i = 0; i < 1; i++) {
                 list.add(obj);
@@ -197,8 +209,8 @@ public class GenericFixture {
             Class<?>[] innerClasses = getInnerClasses(type);
             Map<Object, Object> map = new HashMap<>();
 
-            Object key = getObjectByClass(innerClasses[0], ignoredFields);
-            Object value = getObjectByClass(innerClasses[1], ignoredFields);
+            Object key = getObjectByClass(innerClasses[0], ignoredFields, currentPath);
+            Object value = getObjectByClass(innerClasses[1], ignoredFields, currentPath);
 
             map.put(key, value);
             return map;
@@ -209,7 +221,7 @@ public class GenericFixture {
 
     private static boolean hasNoArgsConstructor(Class<?> clazz) {
         Constructor<?>[] constructors = clazz.getConstructors();
-        for(Constructor<?> c: constructors) {
+        for (Constructor<?> c : constructors) {
             if (c.getParameterCount() == 0) {
                 return true;
             }
@@ -217,14 +229,14 @@ public class GenericFixture {
         return false;
     }
 
-    private static Object getObjectByClass(Class<?> innerClass, List<String> ignoredFields) throws Exception {
+    private static Object getObjectByClass(Class<?> innerClass, List<String> ignoredFields, String currentPath) throws Exception {
         return isComplexClass(innerClass) ?
-                generate(innerClass, ignoredFields) :
-                getRandomForType(innerClass, null, new HashMap<>(), null);
+                generate(innerClass, ignoredFields, currentPath) :
+                getRandomForType(innerClass, null, new HashMap<>(), null, currentPath);
     }
 
     private static boolean isComplexClass(Class<?> clazz) {
-        if(nonNull(clazz.getPackage())) {
+        if (nonNull(clazz.getPackage())) {
             return !clazz.getPackage().getName().startsWith("java");
         }
 
@@ -238,7 +250,7 @@ public class GenericFixture {
         Type[] types = parameterizedType.getActualTypeArguments();
 
         Class<?>[] innerClasses = new Class<?>[types.length];
-        for (int i=0; i<types.length; i++) {
+        for (int i = 0; i < types.length; i++) {
             Type t = types[i];
             Class<?> innerClass = Class.forName(t.getTypeName()); //Fully qualified name
             innerClasses[i] = innerClass;
