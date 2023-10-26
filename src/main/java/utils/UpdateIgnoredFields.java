@@ -34,7 +34,7 @@ public class UpdateIgnoredFields {
     }
 
     public static List<String> removeItem(List<String> ignoredFields, String currentPath) {
-        //Não usar o .collect e sim usar um removeIf
+        //Não usar o Collects.toList() e sim usar um removeIf
         return ignoredFields.stream()
                 .filter(f -> !f.equals(currentPath))
                 .collect(Collectors.toList());
