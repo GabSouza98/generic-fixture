@@ -16,7 +16,7 @@ class GenericFixtureTest {
     @Test
     void shouldValidateAllFields() throws Exception {
         Dummy dummy = GenericFixture.generate(Dummy.class);
-        assertTrue(dummy.getPrimitiveInt() != 0, "Erro para o tipo int");//Esta falhando as vezes
+        assertTrue(dummy.getPrimitiveInt() != 0, "Erro para o tipo int");
         assertNotNull(dummy.getString(), "Erro para o tipo String");
         assertNotNull(dummy.getInteger(), "Erro para o tipo Integer");
         assertNotNull(dummy.getDouble(), "Erro para o tipo Double");
@@ -163,7 +163,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexTypeInteger_Field22() throws Exception {
+    void shouldIgnore_ComplexTypeDeepestTypeDeepest_Field() throws Exception {
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, Collections.singletonList("ComplexType.DeepestType.deepest"));
 
         assertNull(dummyWithIgnoredFields.getComplexType().getDeepestType().getDeepest());

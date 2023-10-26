@@ -9,8 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -23,25 +22,27 @@ public class Dummy {
     private static String stringEstatica = "minha string estatica";
     private final String constante = "CONSTANTE";
 
+    //na raiz -> ""
+
     private int primitiveInt;
+    private ComplexType ComplexType; //attributesPath = ComplexType
     private String String;
     private Long Long;
     private Double Double;
     private Boolean Boolean;
     private LocalDateTime LocalDateTime;
     private OffsetDateTime OffsetDateTime;
-    private ComplexType ComplexType;
-    private List<ComplexType> complexList;
-    private List<Integer> integerList;
-    private List<Double> doubleList;
-    private List<String> stringList;
-    private List<Character> charList;
-    private List<Boolean> booleanList;
+    private ArrayList<ComplexType> complexList;
+    private LinkedList<Integer> integerList;
+    private Set<Double> doubleList;
+    private Deque<String> stringList;
+    private SortedSet<Character> charList;
+    private Queue<Boolean> booleanList;
     private CustomEnum CustomEnum;
     private Map<String, String> stringMap;
-    private Map<Integer, Integer> integerMap;
-    private Map<Integer, String> mixedMap;
-    private Map<Integer, ComplexType> complexTypeMap;
+    private Dictionary<Integer, Integer> integerMap;
+    private AbstractMap<Integer, String> mixedMap;
+    private SortedMap<Integer, ComplexType> complexTypeMap;
     private Integer Integer;
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$")

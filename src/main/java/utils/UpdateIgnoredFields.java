@@ -33,17 +33,10 @@ public class UpdateIgnoredFields {
         return updatedList;
     }
 
-    public static List<String> removeItem(List<String> ignoredFields, String fieldName, String attributesPath) {
-
-        String toCheck;
-        if (attributesPath.isEmpty()) {
-            toCheck = fieldName;
-        } else {
-            toCheck = attributesPath.concat(".").concat(fieldName);
-        }
-
+    public static List<String> removeItem(List<String> ignoredFields, String currentPath) {
+        //Não usar o .collect e sim usar um removeIf
         return ignoredFields.stream()
-                .filter(f -> !f.equals(toCheck))
+                .filter(f -> !f.equals(currentPath))
                 .collect(Collectors.toList());
     }
 

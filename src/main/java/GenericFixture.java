@@ -52,14 +52,16 @@ public class GenericFixture {
 
                 String fieldName = field.getName();
 
-                if (isIgnorableField(ignoredFields, fieldName, attributesPath)) {
-                    ignoredFields = removeItem(ignoredFields, fieldName, attributesPath); //This line is optional
+                String currentPath = handleAttributesPath(fieldName, attributesPath);
+
+                if (!ignoredFields.isEmpty() && isIgnorableField(ignoredFields, currentPath)) {
+                    //to no lugar certo
+                    //field.set(type, personalFields.get(currentPath));
+                    ignoredFields = removeItem(ignoredFields, currentPath); //This line is optional
                     continue;
                 }
 
                 Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-
-                String currentPath = handleAttributesPath(fieldName, attributesPath);
                 Object result = getRandomForType(field.getType(), field.getGenericType(), map, ignoredFields, currentPath);
 
                 field.set(type, result);
@@ -80,19 +82,7 @@ public class GenericFixture {
                 .collect(Collectors.toList());
     }
 
-    private static boolean containsIgnorableField(List<String> ignoredFields, String fieldName) {
-        //If ignoredFields contains "A.B.C" and fieldName is "A"
-        return !ignoredFields.isEmpty() && ignoredFields.stream().anyMatch(f -> f.startsWith(fieldName));
-    }
-
-    private static boolean isDeepestField(List<String> ignoredFields, String fieldName) {
-        //If ignoredFields contains "A" and fieldName is exactly "A"
-        return ignoredFields.stream().anyMatch(f -> f.equals(fieldName));
-    }
-
-    private static boolean isIgnorableField(List<String> ignoredFields, String fieldName, String attributesPath) {
-        String currentPath = handleAttributesPath(fieldName, attributesPath);
-
+    private static boolean isIgnorableField(List<String> ignoredFields, String currentPath) {
         //If ignoredFields contains "A.B.C" and currentPath is exactly "A.B.C"
         return ignoredFields.stream().anyMatch(f -> f.equals(currentPath));
     }
@@ -153,7 +143,7 @@ public class GenericFixture {
         }
 
         if (fieldType == Integer.class || fieldType == int.class) {
-            return r.nextInt(10);
+            return r.nextInt(100000);
         }
 
         if (fieldType == Double.class || fieldType == double.class) {
@@ -193,19 +183,83 @@ public class GenericFixture {
             }
         }
 
-        if (fieldType == List.class) {
-            Class<?>[] innerClasses = getInnerClasses(type);
-            List<Object> list = new ArrayList<>();
+        if (implementsCollection(fieldType)) {
 
+            Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside List<T>
             Object obj = getObjectByClass(innerClasses[0], ignoredFields, currentPath);
+            Collection<Object> collection = null;
+
+            if (fieldType.isInterface()) {
+
+                //Verify all possible Interfaces that extends Collection
+                //and choose default implementation
+                if (fieldType == List.class) {
+                    collection = new ArrayList<>();
+                }
+                if (fieldType == Queue.class) {
+                    collection = new PriorityQueue<>();
+                }
+                if (fieldType == Deque.class) {
+                    collection = new ArrayDeque<>();
+                }
+                if (fieldType == Set.class) {
+                    collection = new HashSet<>();
+                }
+                if (fieldType == SortedSet.class) {
+                    collection = new TreeSet<>();
+                }
+
+            } else {
+                collection = (Collection<Object>) fieldType.getDeclaredConstructor().newInstance();
+            }
+
+            assert collection != null;
 
             for (int i = 0; i < 1; i++) {
-                list.add(obj);
+                collection.add(obj);
             }
-            return list;
+
+            return collection;
+        }
+
+        if (implementsMap(fieldType) || isDictionary(fieldType)) {
+
+            Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside List<T>
+            Map<Object, Object> map = null;
+
+            Object key = getObjectByClass(innerClasses[0], ignoredFields, currentPath);
+            Object value = getObjectByClass(innerClasses[1], ignoredFields, currentPath);
+
+            if (fieldType.isInterface() || Modifier.isAbstract(fieldType.getModifiers())) {
+
+                //Verify all possible Interfaces/AbstractClasses that extends Map
+                //and choose default implementation
+                if (fieldType == Map.class ||
+                    fieldType == AbstractMap.class ||
+                    fieldType == SortedMap.class ||
+                    fieldType == NavigableMap.class) {
+                    map = new TreeMap<>();
+                }
+
+                if (fieldType == Dictionary.class) {
+                    map = new Hashtable<>();
+                }
+
+            } else {
+                map = (Map<Object, Object>) fieldType.getDeclaredConstructor().newInstance();
+            }
+
+            assert map != null;
+
+            for (int i = 0; i < 1; i++) {
+                map.put(key, value);
+            }
+
+            return map;
         }
 
         if (fieldType == Map.class) {
+
             Class<?>[] innerClasses = getInnerClasses(type);
             Map<Object, Object> map = new HashMap<>();
 
@@ -217,6 +271,18 @@ public class GenericFixture {
         }
 
         throw new Exception("Type not recognized: ".concat(fieldType.getTypeName()));
+    }
+
+    private static boolean implementsCollection(Class<?> fieldType) {
+        return Collection.class.isAssignableFrom(fieldType);
+    }
+
+    private static boolean implementsMap(Class<?> fieldType) {
+        return Map.class.isAssignableFrom(fieldType);
+    }
+
+    private static boolean isDictionary(Class<?> fieldType) {
+        return fieldType == Dictionary.class;
     }
 
     private static boolean hasNoArgsConstructor(Class<?> clazz) {
@@ -246,7 +312,7 @@ public class GenericFixture {
     private static Class<?>[] getInnerClasses(Type type) throws ClassNotFoundException {
         //If the field has generics, we need to get the generic types
         ParameterizedType parameterizedType = (ParameterizedType) type;
-        //Generic types, like List<T> or Map<K, V>
+        //Inner types, like T of List<T> or K, V of Map<K, V>
         Type[] types = parameterizedType.getActualTypeArguments();
 
         Class<?>[] innerClasses = new Class<?>[types.length];
