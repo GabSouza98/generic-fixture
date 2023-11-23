@@ -17,25 +17,24 @@ import java.util.stream.Collectors;
 import static enums.AnnotationsEnum.PATTERN;
 import static enums.AnnotationsEnum.SIZE;
 import static java.util.Objects.nonNull;
-import static utils.UpdateIgnoredFields.removeItem;
 
 public class GenericFixture {
 
     static SecureRandom r = new SecureRandom();
 
     public static <T> T generate(Class<T> clazz) throws Exception {
-        return doGenerate(clazz, new ArrayList<>(), "");
+        return doGenerate(clazz, new HashMap<>(), "");
     }
 
-    public static <T> T generate(Class<T> clazz, List<String> ignoredFields) throws Exception {
-        return doGenerate(clazz, ignoredFields, "");
+    public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) throws Exception {
+        return doGenerate(clazz, customFields, "");
     }
 
-    private static <T> T generate(Class<T> clazz, List<String> ignoredFields, String attributesPath) throws Exception {
-        return doGenerate(clazz, ignoredFields, attributesPath);
+    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) throws Exception {
+        return doGenerate(clazz, customFields, attributesPath);
     }
 
-    public static <T> T doGenerate(Class<T> clazz, List<String> ignoredFields, String attributesPath) throws Exception {
+    public static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) throws Exception {
 
         try {
 
@@ -54,15 +53,14 @@ public class GenericFixture {
 
                 String currentPath = handleAttributesPath(fieldName, attributesPath);
 
-                if (!ignoredFields.isEmpty() && isIgnorableField(ignoredFields, currentPath)) {
-                    //to no lugar certo
-                    //field.set(type, personalFields.get(currentPath));
-                    ignoredFields = removeItem(ignoredFields, currentPath); //This line is optional
+                if (!customFields.isEmpty() && isCustomField(customFields, currentPath)) {
+                    field.set(type, customFields.get(currentPath));
+                    customFields.remove(currentPath); //This line is optional
                     continue;
                 }
 
                 Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                Object result = getRandomForType(field.getType(), field.getGenericType(), map, ignoredFields, currentPath);
+                Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath);
 
                 field.set(type, result);
             }
@@ -82,9 +80,9 @@ public class GenericFixture {
                 .collect(Collectors.toList());
     }
 
-    private static boolean isIgnorableField(List<String> ignoredFields, String currentPath) {
-        //If ignoredFields contains "A.B.C" and currentPath is exactly "A.B.C"
-        return ignoredFields.stream().anyMatch(f -> f.equals(currentPath));
+    private static boolean isCustomField(Map<String, Object> customFields, String currentPath) {
+        //If customFields contains "A.B.C" and currentPath is exactly "A.B.C"
+        return customFields.keySet().stream().anyMatch(f -> f.equals(currentPath));
     }
 
     public static String handleAttributesPath(String fieldName, String attributesPath) {
@@ -118,7 +116,7 @@ public class GenericFixture {
     private static Object getRandomForType(Class<?> fieldType,
                                            Type type,
                                            Map<AnnotationsEnum, Annotation> hashMap,
-                                           List<String> ignoredFields,
+                                           Map<String, Object> customFields,
                                            String currentPath) throws Exception {
 
         if (fieldType == String.class) {
@@ -179,14 +177,14 @@ public class GenericFixture {
             if (fieldType.isEnum()) {
                 return fieldType.getEnumConstants()[0];
             } else {
-                return generate(fieldType, ignoredFields, currentPath);
+                return generate(fieldType, customFields, currentPath);
             }
         }
 
         if (implementsCollection(fieldType)) {
 
             Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside List<T>
-            Object obj = getObjectByClass(innerClasses[0], ignoredFields, currentPath);
+            Object obj = getObjectByClass(innerClasses[0], customFields, currentPath);
             Collection<Object> collection = null;
 
             if (fieldType.isInterface()) {
@@ -227,8 +225,8 @@ public class GenericFixture {
             Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside List<T>
             Map<Object, Object> map = null;
 
-            Object key = getObjectByClass(innerClasses[0], ignoredFields, currentPath);
-            Object value = getObjectByClass(innerClasses[1], ignoredFields, currentPath);
+            Object key = getObjectByClass(innerClasses[0], customFields, currentPath);
+            Object value = getObjectByClass(innerClasses[1], customFields, currentPath);
 
             if (fieldType.isInterface() || Modifier.isAbstract(fieldType.getModifiers())) {
 
@@ -263,8 +261,8 @@ public class GenericFixture {
             Class<?>[] innerClasses = getInnerClasses(type);
             Map<Object, Object> map = new HashMap<>();
 
-            Object key = getObjectByClass(innerClasses[0], ignoredFields, currentPath);
-            Object value = getObjectByClass(innerClasses[1], ignoredFields, currentPath);
+            Object key = getObjectByClass(innerClasses[0], customFields, currentPath);
+            Object value = getObjectByClass(innerClasses[1], customFields, currentPath);
 
             map.put(key, value);
             return map;
@@ -295,9 +293,9 @@ public class GenericFixture {
         return false;
     }
 
-    private static Object getObjectByClass(Class<?> innerClass, List<String> ignoredFields, String currentPath) throws Exception {
+    private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath) throws Exception {
         return isComplexClass(innerClass) ?
-                generate(innerClass, ignoredFields, currentPath) :
+                generate(innerClass, customFields, currentPath) :
                 getRandomForType(innerClass, null, new HashMap<>(), null, currentPath);
     }
 
