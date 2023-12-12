@@ -2,6 +2,7 @@ package utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class UpdateIgnoredFields {
@@ -31,13 +32,6 @@ public class UpdateIgnoredFields {
             }
         });
         return updatedList;
-    }
-
-    public static List<String> removeItem(List<String> ignoredFields, String currentPath) {
-        //Não usar o Collects.toList() e sim usar um removeIf
-        return ignoredFields.stream()
-                .filter(f -> !f.equals(currentPath))
-                .collect(Collectors.toList());
     }
 
 }
