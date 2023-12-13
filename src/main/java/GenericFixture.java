@@ -143,7 +143,7 @@ public class GenericFixture {
         return size.max() == Integer.MAX_VALUE ? size.min() : size.max();
     }
 
-    public static Object getRandomForType(Class<?> fieldType,
+    private static Object getRandomForType(Class<?> fieldType,
                                            Type type,
                                            Map<AnnotationsEnum, Annotation> hashMap,
                                            Map<String, Object> customFields,
