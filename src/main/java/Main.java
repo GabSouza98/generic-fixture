@@ -1,13 +1,18 @@
 import domain.Dummy;
+import domain.DummyWithArgsContructors;
+import sun.net.www.content.text.Generic;
+
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        Dummy dummy = GenericFixture.generate(Dummy.class);
+        DummyWithArgsContructors dummy = GenericFixture.generate(DummyWithArgsContructors.class);
+
         System.out.println(dummy);
-        //para usar depois
-//        System.out.println(ThreadLocalRandom.current().nextDouble(0, 1));
 
     }
 
