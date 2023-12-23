@@ -63,11 +63,11 @@ public class GenericFixture {
                 }
 
                 //Only set field value if not already defined.
-                if (isNull(field.get(type))) {
+               if (isNull(field.get(type)) || field.getType().isPrimitive()) {
                     Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
                     Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath);
                     field.set(type, result);
-                }
+               }
             }
 
             return type;

@@ -10,21 +10,20 @@ import lombok.ToString;
 public class DummyWithArgsContructors {
 
     private String name;
-    private int numero;
-    private Long outroLong;
-    private Double outroDouble;
+    private int number;
+    private Long anyLong;
+    private Double anyDouble;
     private ComplexType complexType;
 
-    public DummyWithArgsContructors(String name, int numero, Long asdasd) {
+    public DummyWithArgsContructors(String name, int number, Long anyLong) {
         this.name = name;
-        this.numero = numero;
-        this.outroLong = asdasd;
+        this.number = number;
+        this.anyLong = anyLong;
     }
 
-    public DummyWithArgsContructors(String name, int numero) {
+    public DummyWithArgsContructors(String name, int number) {
         this.name = name;
-        this.numero = numero;
+        this.number = number;
     }
-
 
 }

@@ -25,6 +25,7 @@ public class Dummy {
     //na raiz -> ""
 
     private int primitiveInt;
+    private double primitiveDouble;
     private ComplexType ComplexType; //attributesPath = ComplexType
     private String String;
     private Long Long;

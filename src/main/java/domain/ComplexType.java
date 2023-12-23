@@ -9,6 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 public class ComplexType {
 
+    private int primitiveInt;
+    private double primitiveDouble;
     private String String;
     private Long Long;
     private Integer Integer;
