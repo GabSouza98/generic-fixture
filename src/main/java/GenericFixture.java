@@ -1,6 +1,5 @@
 import com.github.curiousoddman.rgxgen.RgxGen;
 import enums.AnnotationsEnum;
-import exceptions.NoArgsConstructorException;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static enums.AnnotationsEnum.PATTERN;
 import static enums.AnnotationsEnum.SIZE;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class GenericFixture {
@@ -34,15 +34,18 @@ public class GenericFixture {
         return doGenerate(clazz, customFields, attributesPath);
     }
 
-    public static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) throws Exception {
+    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) throws Exception {
 
         try {
 
-            if (!hasNoArgsConstructor(clazz)) {
-                throw new NoArgsConstructorException();
+            T type;
+
+            if (hasNoArgsConstructor(clazz)) {
+                type = clazz.getDeclaredConstructor().newInstance();
+            } else {
+                type = getInstanceForConstructorWithLessArguments(clazz);
             }
 
-            T type = clazz.getDeclaredConstructor().newInstance();
             Field[] fields = type.getClass().getDeclaredFields();
             List<Field> fieldsList = ignoreFinalFields(fields);
 
@@ -59,10 +62,12 @@ public class GenericFixture {
                     continue;
                 }
 
-                Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath);
-
-                field.set(type, result);
+                //Only set field value if not already defined.
+               if (isNull(field.get(type)) || field.getType().isPrimitive()) {
+                    Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
+                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath);
+                    field.set(type, result);
+               }
             }
 
             return type;
@@ -78,6 +83,31 @@ public class GenericFixture {
                 .filter(f -> !Modifier.isFinal(f.getModifiers()))
                 .filter(f -> !Modifier.isStatic(f.getModifiers()))
                 .collect(Collectors.toList());
+    }
+
+    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz) throws Exception {
+
+        Constructor<?>[] construtores = clazz.getConstructors();
+
+        //Order constructor array by lesser parameter count
+        Object[] listaConstrutores = Arrays.stream(construtores)
+                .sorted(Comparator.comparing(Constructor::getParameterCount))
+                .toArray();
+
+        Constructor<?> construtor = (Constructor<?>) listaConstrutores[0];
+
+        //Get array of parameter types of the constructor
+        Class<?>[] parameterTypes = construtor.getParameterTypes();
+
+        //Array for storing the values for each argument
+        Object[] arguments = new Object[parameterTypes.length];
+
+        for (int i=0; i<parameterTypes.length; i++) {
+            //Generates a value for each argument
+            arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "");
+        }
+
+        return (T) construtor.newInstance(arguments);
     }
 
     private static boolean isCustomField(Map<String, Object> customFields, String currentPath) {

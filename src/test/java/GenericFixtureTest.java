@@ -20,6 +20,7 @@ class GenericFixtureTest {
     void shouldValidateAllFields() throws Exception {
         Dummy dummy = GenericFixture.generate(Dummy.class);
         assertTrue(dummy.getPrimitiveInt() != 0, "Erro para o tipo int");
+        assertTrue(dummy.getPrimitiveDouble() != 0, "Erro para o tipo int");
         assertNotNull(dummy.getString(), "Erro para o tipo String");
         assertNotNull(dummy.getInteger(), "Erro para o tipo Integer");
         assertNotNull(dummy.getDouble(), "Erro para o tipo Double");
@@ -49,11 +50,6 @@ class GenericFixtureTest {
         assertTrue(dummy.getMaximumString().length() <= 6, "Erro para a anotação Size(max)");
         assertTrue(dummy.getMediumString().length() >= 4, "Erro para a anotação Size(min, max)");
         assertTrue(dummy.getMediumString().length() <= 9, "Erro para a anotação Size(min, max)");
-    }
-
-    @Test
-    void shouldThrowExceptionWhenDoesntHasNoArgsConstructor() {
-        assertThrows(NoArgsConstructorException.class, () -> GenericFixture.generate(DummyWithArgsContructors.class));
     }
 
     @Test
@@ -204,6 +200,8 @@ class GenericFixtureTest {
         assertEquals(complexType.getLong(), dummyWithIgnoredFields.getComplexType().getLong());
         assertEquals(complexType.getInteger(), dummyWithIgnoredFields.getComplexType().getInteger());
         assertEquals(complexType.getBoolean(), dummyWithIgnoredFields.getComplexType().getBoolean());
+        assertEquals(complexType.getPrimitiveInt(), dummyWithIgnoredFields.getComplexType().getPrimitiveInt());
+        assertEquals(complexType.getPrimitiveDouble(), dummyWithIgnoredFields.getComplexType().getPrimitiveDouble());
         assertEquals(complexType.getDeepestType().getDeepest(), dummyWithIgnoredFields.getComplexType().getDeepestType().getDeepest());
 
         assertNotNull(dummyWithIgnoredFields.getComplexList().get(0).getString());
@@ -339,5 +337,44 @@ class GenericFixtureTest {
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
         assertEquals(NAME, dummyWithIgnoredFields.getComplexType().getDeepestType().getDeepest());
+    }
+
+    @Test
+    void shouldCreateInstanceWithoutNoArgsConstructor() throws Exception {
+
+        DummyWithArgsContructors dummyWithArgsContructors = GenericFixture.generate(DummyWithArgsContructors.class);
+
+        assertNotNull(dummyWithArgsContructors.getName());
+        assertNotNull(dummyWithArgsContructors.getNumber());
+        assertNotNull(dummyWithArgsContructors.getAnyLong());
+        assertNotNull(dummyWithArgsContructors.getAnyDouble());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getBoolean());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getString());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getLong());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getInteger());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getDouble());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getDeepestType().getDeepest());
+
+    }
+
+    @Test
+    void shouldCreateInstanceWithoutNoArgsConstructorAndCustomValues() throws Exception {
+
+        customFields.put("name", NAME);
+        customFields.put("anyLong", null);
+
+        DummyWithArgsContructors dummyWithArgsContructors = GenericFixture.generate(DummyWithArgsContructors.class, customFields);
+
+        assertEquals(NAME, dummyWithArgsContructors.getName());
+        assertNull(dummyWithArgsContructors.getAnyLong());
+        assertNotNull(dummyWithArgsContructors.getNumber());
+        assertNotNull(dummyWithArgsContructors.getAnyDouble());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getBoolean());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getString());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getLong());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getInteger());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getDouble());
+        assertNotNull(dummyWithArgsContructors.getComplexType().getDeepestType().getDeepest());
+
     }
 }
