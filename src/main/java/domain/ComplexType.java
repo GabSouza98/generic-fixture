@@ -7,6 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ComplexType {
 
     private int primitiveInt;
@@ -18,14 +19,4 @@ public class ComplexType {
     private Boolean Boolean;
     private DeepestType DeepestType;
 
-    @Override
-    public java.lang.String toString() {
-        return "ComplexType {\n" +
-                "        String='" + String + '\'' + "\n" +
-                "        Long=" + Long +"\n" +
-                "        Integer=" + Integer +"\n" +
-                "        Double=" + Double +"\n" +
-                "        Boolean=" + Boolean +"\n" +
-                "        }";
-    }
 }

@@ -17,7 +17,7 @@ class GenericFixtureTest {
     HashMap<String, Object> customFields = new HashMap<>();
 
     @Test
-    void shouldValidateAllFields() throws Exception {
+    void shouldValidateAllFields() {
         Dummy dummy = GenericFixture.generate(Dummy.class);
         assertTrue(dummy.getPrimitiveInt() != 0, "Erro para o tipo int");
         assertTrue(dummy.getPrimitiveDouble() != 0, "Erro para o tipo int");
@@ -43,7 +43,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldTestFieldWithAnnotations() throws Exception {
+    void shouldTestFieldWithAnnotations() {
         Dummy dummy = GenericFixture.generate(Dummy.class);
         assertTrue(Pattern.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$", dummy.getStringWithDateFormat()), "Erro para formatar no pattern");
         assertTrue(dummy.getMinimumString().length() >= 3, "Erro para a anotação Size(min)");
@@ -53,7 +53,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_String_Field() throws Exception {
+    void shouldIgnore_String_Field() {
         customFields.put("String", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -63,7 +63,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexType_Field() throws Exception {
+    void shouldIgnore_ComplexType_Field() {
         customFields.put("ComplexType", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -72,7 +72,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexType_String_Field() throws Exception {
+    void shouldIgnore_ComplexType_String_Field() {
         customFields.put("ComplexType.String", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -82,7 +82,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_complexList_Field() throws Exception {
+    void shouldIgnore_complexList_Field() {
         customFields.put("complexList", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -91,7 +91,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_complexList_String_Field() throws Exception {
+    void shouldIgnore_complexList_String_Field() {
         customFields.put("complexList.String", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -101,7 +101,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexType_And_String_Field() throws Exception {
+    void shouldIgnore_ComplexType_And_String_Field() {
         customFields.put("ComplexType", null);
         customFields.put("String", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class,customFields);
@@ -112,7 +112,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexTypeString_And_String_Field() throws Exception {
+    void shouldIgnore_ComplexTypeString_And_String_Field() {
         customFields.put("ComplexType.String", null);
         customFields.put("String", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
@@ -123,7 +123,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_complexListString_And_String_Field() throws Exception {
+    void shouldIgnore_complexListString_And_String_Field() {
         customFields.put("complexList.String", null);
         customFields.put("String", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
@@ -134,7 +134,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexTypeString_And_complexListString_And_String_Field() throws Exception {
+    void shouldIgnore_ComplexTypeString_And_complexListString_And_String_Field() {
         customFields.put("ComplexType.String", null);
         customFields.put("String", null);
         customFields.put("complexList.String", null);
@@ -146,7 +146,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexTypeString_And_complexListString_Field() throws Exception {
+    void shouldIgnore_ComplexTypeString_And_complexListString_Field() {
         customFields.put("ComplexType.String", null);
         customFields.put("complexList.String", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
@@ -157,7 +157,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_Integer_Field() throws Exception {
+    void shouldIgnore_Integer_Field() {
         customFields.put("Integer", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -169,7 +169,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexTypeInteger_Field() throws Exception {
+    void shouldIgnore_ComplexTypeInteger_Field() {
         customFields.put("ComplexType.Integer", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -180,7 +180,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldIgnore_ComplexTypeDeepestTypeDeepest_Field() throws Exception {
+    void shouldIgnore_ComplexTypeDeepestTypeDeepest_Field() {
         customFields.put("ComplexType.DeepestType.deepest", null);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -189,7 +189,7 @@ class GenericFixtureTest {
 
     //TODO ABAIXO
     @Test
-    void shouldSet_ComplexType_Field() throws Exception {
+    void shouldSet_ComplexType_Field() {
         ComplexType complexType = GenericFixture.generate(ComplexType.class);
         customFields.put("ComplexType", complexType);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
@@ -208,7 +208,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_ComplexType_String_Field() throws Exception {
+    void shouldSet_ComplexType_String_Field() {
         customFields.put("ComplexType.String", NAME);
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -218,7 +218,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_complexList_Field() throws Exception {
+    void shouldSet_complexList_Field() {
         customFields.put("complexList", new ArrayList<ComplexType>());
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
@@ -227,7 +227,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_complexList_String_Field() throws Exception {
+    void shouldSet_complexList_String_Field() {
         customFields.put("complexList.String", NAME);
 
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
@@ -238,7 +238,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_ComplexType_And_String_Field() throws Exception {
+    void shouldSet_ComplexType_And_String_Field() {
         ComplexType complexType = GenericFixture.generate(ComplexType.class);
         customFields.put("ComplexType", complexType);
         customFields.put("String", NAME);
@@ -257,7 +257,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_ComplexTypeString_And_String_Field() throws Exception {
+    void shouldSet_ComplexTypeString_And_String_Field() {
         customFields.put("ComplexType.String", NAME);
         customFields.put("String", NAME);
 
@@ -269,7 +269,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_complexListString_And_String_Field() throws Exception {
+    void shouldSet_complexListString_And_String_Field() {
         customFields.put("complexList.String", NAME);
         customFields.put("String", NAME);
 
@@ -281,7 +281,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_ComplexTypeString_And_complexListString_And_String_Field() throws Exception {
+    void shouldSet_ComplexTypeString_And_complexListString_And_String_Field() {
         customFields.put("ComplexType.String", NAME);
         customFields.put("String", NAME);
         customFields.put("complexList.String", NAME);
@@ -294,7 +294,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_ComplexTypeString_And_complexListString_Field() throws Exception {
+    void shouldSet_ComplexTypeString_And_complexListString_Field() {
         customFields.put("ComplexType.String", NAME);
         customFields.put("complexList.String", NAME);
 
@@ -306,7 +306,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_Integer_Field() throws Exception {
+    void shouldSet_Integer_Field() {
         customFields.put("Integer", NUMBER_TEN);
 
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
@@ -319,7 +319,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_ComplexTypeInteger_Field() throws Exception {
+    void shouldSet_ComplexTypeInteger_Field() {
         customFields.put("ComplexType.Integer", NUMBER_TEN);
 
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
@@ -331,7 +331,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldSet_ComplexTypeDeepestTypeDeepest_Field() throws Exception {
+    void shouldSet_ComplexTypeDeepestTypeDeepest_Field() {
         customFields.put("ComplexType.DeepestType.deepest", NAME);
 
         Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
@@ -340,7 +340,7 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldCreateInstanceWithoutNoArgsConstructor() throws Exception {
+    void shouldCreateInstanceWithoutNoArgsConstructor() {
 
         DummyWithArgsContructors dummyWithArgsContructors = GenericFixture.generate(DummyWithArgsContructors.class);
 
@@ -354,11 +354,10 @@ class GenericFixtureTest {
         assertNotNull(dummyWithArgsContructors.getComplexType().getInteger());
         assertNotNull(dummyWithArgsContructors.getComplexType().getDouble());
         assertNotNull(dummyWithArgsContructors.getComplexType().getDeepestType().getDeepest());
-
     }
 
     @Test
-    void shouldCreateInstanceWithoutNoArgsConstructorAndCustomValues() throws Exception {
+    void shouldCreateInstanceWithoutNoArgsConstructorAndCustomValues() {
 
         customFields.put("name", NAME);
         customFields.put("anyLong", null);
