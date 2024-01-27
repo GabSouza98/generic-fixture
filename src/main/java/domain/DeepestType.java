@@ -1,8 +1,12 @@
 package domain;
 
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.Negative;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class DeepestType {
     private String deepest;
 

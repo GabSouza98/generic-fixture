@@ -20,6 +20,7 @@ public class Dummy {
     private final String constante = "CONSTANTE";
 
     private int primitiveInt;
+    private double primitiveDouble;
     private ComplexType ComplexType; //attributesPath = ComplexType
     private String String;
     private Long Long;
