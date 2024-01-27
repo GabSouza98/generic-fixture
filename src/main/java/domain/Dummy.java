@@ -98,8 +98,32 @@ public class Dummy {
     @Min(2)
     private Integer minInteger;
 
+    @Min(2)
+    private Double minDouble;
+
+    @Min(2)
+    private long minLong;
+
+    @Min(2)
+    private BigDecimal minBigDecimal;
+
+    @Min(2)
+    private String minString;
+
     @Max(10)
     private Integer maxInteger;
+
+    @Max(10)
+    private double maxDouble;
+
+    @Max(10)
+    private Long maxLong;
+
+    @Max(10)
+    private String maxString;
+
+    @Max(10)
+    private BigDecimal maxBigDecimal;
 
     @Digits(integer = 5, fraction = 2)
     private BigDecimal digitsWithIntegerAndFractionBigDecimal;

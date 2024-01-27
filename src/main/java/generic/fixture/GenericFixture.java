@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Negative;
 import jakarta.validation.constraints.NegativeOrZero;
 import jakarta.validation.constraints.Past;
@@ -70,6 +72,8 @@ import static enums.AnnotationsEnum.DIGITS;
 import static enums.AnnotationsEnum.EMAIL;
 import static enums.AnnotationsEnum.FUTURE;
 import static enums.AnnotationsEnum.FUTURE_OR_PRESENT;
+import static enums.AnnotationsEnum.MAX;
+import static enums.AnnotationsEnum.MIN;
 import static enums.AnnotationsEnum.NEGATIVE;
 import static enums.AnnotationsEnum.NEGATIVE_OR_ZERO;
 import static enums.AnnotationsEnum.PAST;
@@ -254,6 +258,14 @@ public class GenericFixture {
             if (annotation instanceof DecimalMax) {
                 hashMap.put(DECIMAL_MAX, annotation);
             }
+
+            if (annotation instanceof Min) {
+                hashMap.put(MIN, annotation);
+            }
+
+            if (annotation instanceof Max) {
+                hashMap.put(MAX, annotation);
+            }
         }
 
         return hashMap;
@@ -300,7 +312,9 @@ public class GenericFixture {
                     || hashMap.containsKey(NEGATIVE_OR_ZERO)
                     || hashMap.containsKey(DECIMAL_MIN)
                     || hashMap.containsKey(DECIMAL_MAX)
-                    || hashMap.containsKey(DIGITS)) {
+                    || hashMap.containsKey(DIGITS)
+                    || hashMap.containsKey(MIN)
+                    || hashMap.containsKey(MAX)) {
                 string = returnValueByPattern(hashMap).toString();
             }
 
@@ -313,7 +327,9 @@ public class GenericFixture {
                     || hashMap.containsKey(POSITIVE_OR_ZERO)
                     || hashMap.containsKey(NEGATIVE)
                     || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                    || hashMap.containsKey(DECIMAL_MAX)) {
+                    || hashMap.containsKey(DECIMAL_MAX)
+                    || hashMap.containsKey(MIN)
+                    || hashMap.containsKey(MAX)) {
                 //A transformação para long descarta as casas decimais
                 return returnValueByPattern(hashMap).longValue();
             }
@@ -327,7 +343,9 @@ public class GenericFixture {
                     || hashMap.containsKey(POSITIVE_OR_ZERO)
                     || hashMap.containsKey(NEGATIVE)
                     || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                    || hashMap.containsKey(DECIMAL_MAX)) {
+                    || hashMap.containsKey(DECIMAL_MAX)
+                    || hashMap.containsKey(MIN)
+                    || hashMap.containsKey(MAX)) {
                 return returnValueByPattern(hashMap).intValue();
             }
 
@@ -341,7 +359,9 @@ public class GenericFixture {
                     || hashMap.containsKey(NEGATIVE)
                     || hashMap.containsKey(NEGATIVE_OR_ZERO)
                     || hashMap.containsKey(DECIMAL_MIN)
-                    || hashMap.containsKey(DECIMAL_MAX)) {
+                    || hashMap.containsKey(DECIMAL_MAX)
+                    || hashMap.containsKey(MIN)
+                    || hashMap.containsKey(MAX)) {
                 return returnValueByPattern(hashMap).doubleValue();
             }
 

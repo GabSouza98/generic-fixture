@@ -5,6 +5,8 @@ import exceptions.AnnotationNotImplementedYet;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
@@ -41,6 +43,16 @@ public class UtilsBigDecimal {
             return new BigDecimal(String.format("%S", getRandomDigits(Integer.parseInt(decimalMax.value()))));
         }
 
+        if (hashMap.containsKey(AnnotationsEnum.MIN)) {
+            Min min = (Min) hashMap.get(AnnotationsEnum.MIN);
+            return new BigDecimal(String.format("%S", RANDOM.longs(min.value(), min.value() + 10).findFirst().getAsLong()));
+        }
+
+        if (hashMap.containsKey(AnnotationsEnum.MAX)) {
+            Max max = (Max) hashMap.get(AnnotationsEnum.MAX);
+            return new BigDecimal(String.format("%S", RANDOM.longs(max.value() -10, max.value()).findFirst().getAsLong()));
+        }
+
         throw new AnnotationNotImplementedYet(hashMap.toString());
 
     }
@@ -55,6 +67,16 @@ public class UtilsBigDecimal {
 
 
     private static String getRandomDigits(int digits) {
+        String value = String.valueOf(getRandomBetweenOneAndTen());
+        for (int i = 1; i < digits; i++) {
+            value = value.concat(String.valueOf(getRandomBetweenOneAndTen()));
+        }
+
+        return value;
+
+    }
+
+    private static String getRandomDigits(long digits ) {
         String value = String.valueOf(getRandomBetweenOneAndTen());
         for (int i = 1; i < digits; i++) {
             value = value.concat(String.valueOf(getRandomBetweenOneAndTen()));

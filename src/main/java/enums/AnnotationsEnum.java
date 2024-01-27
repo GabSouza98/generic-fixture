@@ -21,6 +21,8 @@ public enum AnnotationsEnum {
     FUTURE_OR_PRESENT,
     DECIMAL_MIN,
     DECIMAL_MAX,
+    MIN,
+    MAX,
     EMAIL("^[a-zA-Z0-9_.]{1,10}@email\\.com$");
 
     private String regex;

@@ -2,6 +2,8 @@ import domain.ComplexType;
 import domain.Dummy;
 import domain.DummyWithArgsContructors;
 import generic.fixture.GenericFixture;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -164,6 +166,17 @@ class GenericFixtureTest {
         assertTrue(dummy.getDigitsWithIntegerAndFractionLong().toString().matches(REGEX_SIZE_THREE));
         assertTrue(dummy.getDigitsWithIntegerAndFractionInt().toString().matches(REGEX_SIZE_THREE));
 
+        assertTrue(dummy.getMinInteger() >= 2);
+        assertTrue(dummy.getMinDouble() >= 2);
+        assertTrue(dummy.getMinLong() >= 2);
+        assertTrue(dummy.getMinBigDecimal().longValue() >= 2);
+        assertTrue(Long.parseLong(dummy.getMinString()) >= 2);
+
+        assertTrue(dummy.getMaxInteger() <= 10);
+        assertTrue(dummy.getMaxLong() <= 10);
+        assertTrue(dummy.getMaxDouble() <= 10);
+        assertTrue(dummy.getMaxBigDecimal().longValue() <= 10);
+        assertTrue(Long.parseLong(dummy.getMaxString()) <= 10);
     }
     @Test
     void shouldIgnore_String_Field() {
