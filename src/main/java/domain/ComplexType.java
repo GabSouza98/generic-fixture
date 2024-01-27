@@ -1,6 +1,11 @@
 package domain;
 
-import lombok.*;
+import jakarta.validation.constraints.Negative;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -15,6 +20,9 @@ public class ComplexType {
     private Double Double;
     private Boolean Boolean;
     private DeepestType DeepestType;
+
+    @Negative
+    private String negativeString;
 
     @Override
     public java.lang.String toString() {

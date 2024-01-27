@@ -1,4 +1,5 @@
 import domain.Dummy;
+import generic.fixture.GenericFixture;
 
 public class Main {
 
