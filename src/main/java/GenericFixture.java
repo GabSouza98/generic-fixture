@@ -1,5 +1,6 @@
 import com.github.curiousoddman.rgxgen.RgxGen;
 import enums.AnnotationsEnum;
+import exceptions.TypeNotRecognizedException;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,26 +23,26 @@ public class GenericFixture {
 
     static SecureRandom r = new SecureRandom();
 
-    public static <T> T generate(Class<T> clazz) throws Exception {
+    public static <T> T generate(Class<T> clazz) {
         return doGenerate(clazz, new HashMap<>(), "");
     }
 
-    public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) throws Exception {
+    public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) {
         return doGenerate(clazz, customFields, "");
     }
 
-    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) throws Exception {
+    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) {
         return doGenerate(clazz, customFields, attributesPath);
     }
 
-    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) throws Exception {
+    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) {
 
         try {
 
             T type;
 
             if (hasNoArgsConstructor(clazz)) {
-                type = clazz.getDeclaredConstructor().newInstance();
+                type = clazz.getDeclaredConstructor().newInstance(); //vem tudo nulo
             } else {
                 type = getInstanceForConstructorWithLessArguments(clazz);
             }
@@ -63,18 +64,18 @@ public class GenericFixture {
                 }
 
                 //Only set field value if not already defined.
-               if (isNull(field.get(type)) || field.getType().isPrimitive()) {
+                if (isNull(field.get(type)) || field.getType().isPrimitive()) {
                     Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
                     Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath);
                     field.set(type, result);
-               }
+                }
             }
 
             return type;
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            throw e;
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -102,9 +103,15 @@ public class GenericFixture {
         //Array for storing the values for each argument
         Object[] arguments = new Object[parameterTypes.length];
 
-        for (int i=0; i<parameterTypes.length; i++) {
-            //Generates a value for each argument
-            arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "");
+        for (int i = 0; i < parameterTypes.length; i++) {
+
+            if (parameterTypes[i].isPrimitive()) {
+                //Generates a value for each primitive argument
+                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "");
+            } else {
+                arguments[i] = null;
+            }
+
         }
 
         return (T) construtor.newInstance(arguments);
@@ -214,7 +221,6 @@ public class GenericFixture {
         if (implementsCollection(fieldType)) {
 
             Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside List<T>
-            Object obj = getObjectByClass(innerClasses[0], customFields, currentPath);
             Collection<Object> collection = null;
 
             if (fieldType.isInterface()) {
@@ -244,6 +250,7 @@ public class GenericFixture {
             assert collection != null;
 
             for (int i = 0; i < 1; i++) {
+                Object obj = getObjectByClass(innerClasses[0], customFields, currentPath);
                 collection.add(obj);
             }
 
@@ -254,9 +261,6 @@ public class GenericFixture {
 
             Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside List<T>
             Map<Object, Object> map = null;
-
-            Object key = getObjectByClass(innerClasses[0], customFields, currentPath);
-            Object value = getObjectByClass(innerClasses[1], customFields, currentPath);
 
             if (fieldType.isInterface() || Modifier.isAbstract(fieldType.getModifiers())) {
 
@@ -280,25 +284,16 @@ public class GenericFixture {
             assert map != null;
 
             for (int i = 0; i < 1; i++) {
+                Object key = getObjectByClass(innerClasses[0], customFields, currentPath);
+                Object value = getObjectByClass(innerClasses[1], customFields, currentPath);
+
                 map.put(key, value);
             }
 
             return map;
         }
 
-        if (fieldType == Map.class) {
-
-            Class<?>[] innerClasses = getInnerClasses(type);
-            Map<Object, Object> map = new HashMap<>();
-
-            Object key = getObjectByClass(innerClasses[0], customFields, currentPath);
-            Object value = getObjectByClass(innerClasses[1], customFields, currentPath);
-
-            map.put(key, value);
-            return map;
-        }
-
-        throw new Exception("Type not recognized: ".concat(fieldType.getTypeName()));
+        throw new TypeNotRecognizedException(fieldType.getTypeName());
     }
 
     private static boolean implementsCollection(Class<?> fieldType) {
