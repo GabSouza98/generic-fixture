@@ -2,27 +2,81 @@ package generic.fixture;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
 import enums.AnnotationsEnum;
-import jakarta.validation.constraints.*;
 import exceptions.TypeNotRecognizedException;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Negative;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
 import utils.UtilsDate;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZonedDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Deque;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static enums.AnnotationsEnum.*;
+import static enums.AnnotationsEnum.DECIMAL_MAX;
+import static enums.AnnotationsEnum.DECIMAL_MIN;
+import static enums.AnnotationsEnum.DIGITS;
+import static enums.AnnotationsEnum.EMAIL;
+import static enums.AnnotationsEnum.FUTURE;
+import static enums.AnnotationsEnum.FUTURE_OR_PRESENT;
+import static enums.AnnotationsEnum.NEGATIVE;
+import static enums.AnnotationsEnum.NEGATIVE_OR_ZERO;
+import static enums.AnnotationsEnum.PAST;
+import static enums.AnnotationsEnum.PAST_OR_PRESENT;
 import static enums.AnnotationsEnum.PATTERN;
+import static enums.AnnotationsEnum.POSITIVE;
+import static enums.AnnotationsEnum.POSITIVE_OR_ZERO;
 import static enums.AnnotationsEnum.SIZE;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -178,7 +232,7 @@ public class GenericFixture {
             }
 
             if (annotation instanceof NegativeOrZero) {
-                hashMap.put(NEGATIVE, annotation);
+                hashMap.put(NEGATIVE_OR_ZERO, annotation);
             }
 
             if (annotation instanceof Future) {
