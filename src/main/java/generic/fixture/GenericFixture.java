@@ -330,7 +330,7 @@ public class GenericFixture {
                     || hashMap.containsKey(DECIMAL_MAX)
                     || hashMap.containsKey(MIN)
                     || hashMap.containsKey(MAX)) {
-                //A transformação para long descarta as casas decimais
+                //The transformation to long discards decimal places
                 return returnValueByPattern(hashMap).longValue();
             }
 

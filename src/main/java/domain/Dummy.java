@@ -52,9 +52,6 @@ import java.util.SortedSet;
 @ToString
 public class Dummy {
 
-    private static String stringEstatica = "minha string estatica";
-    private final String constante = "CONSTANTE";
-
     private int primitiveInt;
     private double primitiveDouble;
     private ComplexType ComplexType; //attributesPath = ComplexType
