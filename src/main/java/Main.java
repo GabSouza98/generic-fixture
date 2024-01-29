@@ -1,10 +1,5 @@
-import domain.Dummy;
+import generic.fixture.GenericFixture;
 import domain.DummyWithArgsContructors;
-import sun.net.www.content.text.Generic;
-
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.HashMap;
 
 public class Main {
 

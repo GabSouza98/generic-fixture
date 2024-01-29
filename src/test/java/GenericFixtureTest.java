@@ -1,57 +1,179 @@
 import domain.ComplexType;
 import domain.Dummy;
 import domain.DummyWithArgsContructors;
-import exceptions.NoArgsConstructorException;
+import generic.fixture.GenericFixture;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GenericFixtureTest {
 
     public static final String NAME = "Da Silva";
     public static final Integer NUMBER_TEN = 10;
+    public static final String EMAIL_REGEX = "^[a-zA-Z0-9_.]{1,10}@email\\.com$";
+    public static final String REGEX_THREE_DIGTS_AFTER_POINT = "\\d+\\.\\d{3}";
+    public static final String REGEX_THREE_DIGITS_BEFORE_POINT = "\\d{3}\\.\\d+";
+    public static final String REGEX_SIZE_THREE = "\\d{3}";
+    public static final String FIVE_TWO_DECIMAL_REGEX = "\\d{5}\\.\\d{2}";
     HashMap<String, Object> customFields = new HashMap<>();
 
     @Test
     void shouldValidateAllFields() {
         Dummy dummy = GenericFixture.generate(Dummy.class);
-        assertTrue(dummy.getPrimitiveInt() != 0, "Erro para o tipo int");
-        assertTrue(dummy.getPrimitiveDouble() != 0, "Erro para o tipo int");
-        assertNotNull(dummy.getString(), "Erro para o tipo String");
-        assertNotNull(dummy.getInteger(), "Erro para o tipo Integer");
-        assertNotNull(dummy.getDouble(), "Erro para o tipo Double");
-        assertNotNull(dummy.getLocalDateTime(), "Erro para o tipo LocalDateTime");
-        assertNotNull(dummy.getOffsetDateTime(), "Erro para o tipo OffsetDateTime");
-        assertNotNull(dummy.getComplexType(), "Erro para o tipo ComplexType");
-        assertNotNull(dummy.getComplexList(), "Erro para o tipo complexList");
-        assertNotNull(dummy.getComplexList().get(0), "Erro para inserir registro na complexList");
-        assertNotNull(dummy.getIntegerList(), "Erro para o tipo integerList");
-        assertNotNull(dummy.getDoubleList(), "Erro para o tipo doubleList");
-        assertNotNull(dummy.getStringList(), "Erro para o tipo stringList");
-        assertNotNull(dummy.getCharList(), "Erro para o tipo charList");
-        assertNotNull(dummy.getBooleanList(), "Erro para o tipo booleanList");
-        assertNotNull(dummy.getCustomEnum(), "Erro para o tipo CustomEnum");
-        assertNotNull(dummy.getStringMap(), "Erro para o tipo stringMap");
-        assertNotNull(dummy.getIntegerMap(), "Erro para o tipo integerMap");
-        assertNotNull(dummy.getMixedMap(), "Erro para o tipo mixedMap");
-        assertNotNull(dummy.getComplexTypeMap(), "Erro para o tipo complexMap");
-        assertEquals(1, dummy.getStringMap().size(), "Erro para inserir no CustomMap");
+        assertNotNull(dummy.getBigDecimal());
+        assertTrue(dummy.getPrimitiveInt() != 0, "Error for primitive int type attribute");
+        assertTrue(dummy.getPrimitiveDouble() != 0, "Error for primitive double type attribute");
+        assertNotNull(dummy.getString(), "Error for String type attribute");
+        assertNotNull(dummy.getInteger(), "Error for Integer type attribute");
+        assertNotNull(dummy.getDouble(), "Error for Double type attribute");
+        assertNotNull(dummy.getLocalDateTime(), "Error for LocalDateTime type attribute");
+        assertNotNull(dummy.getOffsetDateTime(), "Error for OffsetDateTime type attribute");
+        assertNotNull(dummy.getDate(), "Error for Date type attribute");
+        assertNotNull(dummy.getZonedDateTime(), "Error for ZonedDateTime type attribute");
+        assertNotNull(dummy.getLocalDate(), "Error for LocalDate type attribute");
+        assertNotNull(dummy.getLocalTime(), "Error for LocalTime type attribute");
+        assertNotNull(dummy.getOffsetTime(), "Error for OffsetTime type attribute");
+        assertNotNull(dummy.getComplexType(), "Error for ComplexType type attribute");
+        assertNotNull(dummy.getComplexList(), "Error for ComplexList type attribute");
+        assertNotNull(dummy.getComplexList().get(0), "Error to insert in ComplexList");
+        assertNotNull(dummy.getIntegerList(), "Error for Integer list type attribute");
+        assertNotNull(dummy.getDoubleList(), "Error for Double list type attribute");
+        assertNotNull(dummy.getStringList(), "Error for String list type attribute");
+        assertNotNull(dummy.getCharList(), "Error for Char list type attribute");
+        assertNotNull(dummy.getBooleanList(), "Error for Boolean list type attribute");
+        assertNotNull(dummy.getCustomEnum(), "Error for CustomEnum type attribute");
+        assertNotNull(dummy.getStringMap(), "Error for String map type attribute");
+        assertNotNull(dummy.getIntegerMap(), "Error for Integer map type attribute");
+        assertNotNull(dummy.getMixedMap(), "Error for MixedMap type attribute");
+        assertNotNull(dummy.getComplexTypeMap(), "Error for ComplexType map type attribute");
+        assertEquals(1, dummy.getStringMap().size(), "Error to insert in String map");
+
     }
 
     @Test
     void shouldTestFieldWithAnnotations() {
         Dummy dummy = GenericFixture.generate(Dummy.class);
-        assertTrue(Pattern.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$", dummy.getStringWithDateFormat()), "Erro para formatar no pattern");
-        assertTrue(dummy.getMinimumString().length() >= 3, "Erro para a anotação Size(min)");
-        assertTrue(dummy.getMaximumString().length() <= 6, "Erro para a anotação Size(max)");
-        assertTrue(dummy.getMediumString().length() >= 4, "Erro para a anotação Size(min, max)");
-        assertTrue(dummy.getMediumString().length() <= 9, "Erro para a anotação Size(min, max)");
-    }
+        assertTrue(Pattern.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$", dummy.getStringWithDateFormat()), "Error for Pattern annotation");
+        assertTrue(dummy.getMinimumString().length() >= 3, "Error for Size(min) annotation");
+        assertTrue(dummy.getMaximumString().length() <= 6, "Error for Size(max) annotation");
+        assertTrue(dummy.getMediumString().length() >= 4, "Error for Size(min, max) annotation");
+        assertTrue(dummy.getMediumString().length() <= 9, "Error for Size(min, max) annotation");
 
+        assertTrue(dummy.getPastLocalDateTime().isBefore(LocalDateTime.now()), format("Error for Past annotation in attribute LocalDateTime, generated value: %s, the value needs to be less than actual date", dummy.getPastLocalDateTime()));
+        assertTrue(dummy.getPastInstant().isBefore(Instant.now()), format("Error for Past annotation in attribute Instant, generated value: %s, the value needs to be less than actual date", dummy.getPastInstant()));
+        assertTrue(dummy.getPastOffsetDateTime().isBefore(OffsetDateTime.now()), format("Error for Past annotation in attribute OffsetDateTime, generated value: %s, the value needs to be less than actual date", dummy.getPastOffsetDateTime()));
+        assertTrue(dummy.getPastZonedDateTime().isBefore(ZonedDateTime.now()), format("Error for Past annotation in attribute ZonedDateTime, generated value: %s, the value needs to be less than actual date", dummy.getPastZonedDateTime()));
+        assertTrue(dummy.getPastLocalDate().isBefore(LocalDate.now()), format("Error for Past annotation in attribute LocalDate, generated value: %s, the value needs to be less than actual date", dummy.getPastLocalDate()));
+        assertTrue(dummy.getPastLocalTime().isBefore(LocalTime.now()), format("Error for Past annotation in attribute LocalTime, generated value: %s, the value needs to be less than actual date", dummy.getPastLocalTime()));
+        assertTrue(dummy.getPastOffsetTime().isBefore(OffsetTime.now()), format("Error for Past annotation in attribute OffsetTime, generated value: %s, the value needs to be less than actual date", dummy.getPastOffsetTime()));
+        assertTrue(dummy.getPastDate().before(new Date()), format("Error for Past annotation in attribute Date, generated value: %s, the value needs to be less than actual date", dummy.getPastDate()));
+
+        assertTrue(dummy.getPastOrPresentLocalDateTime().isBefore(LocalDateTime.now()), format("Error for PastOrPresent annotation in attribute LocalDateTime, generated value: %s, the value needs to be less than actual date", dummy.getPastOrPresentLocalDateTime()));
+        assertTrue(dummy.getPastOrPresentInstant().isBefore(Instant.now().minus(1, ChronoUnit.MINUTES)), format("Error for PastOrPresent annotation in attribute Instant, generated value: %s, the value needs to be less than actual date", dummy.getPastOrPresentInstant()));
+        assertTrue(dummy.getPastOrPresentZonedDateTime().isBefore(ZonedDateTime.now()), format("Error for PastOrPresent annotation in attribute ZonedDateTime, generated value: %s, the value needs to be less than actual date", dummy.getPastOrPresentZonedDateTime()));
+        assertTrue(dummy.getPastOrPresentLocalDate().isBefore(LocalDate.now()), format("Error for PastOrPresent annotation in attribute LocalDate, generated value: %s, the value needs to be less than actual date", dummy.getPastOrPresentLocalDate()));
+        assertTrue(dummy.getPastOrPresentLocalTime().isBefore(LocalTime.now()), format("Error for PastOrPresent annotation in attribute LocalTime, generated value: %s, the value needs to be less than actual date", dummy.getPastOrPresentLocalTime()));
+        assertTrue(dummy.getPastOrPresentOffsetTime().isBefore(OffsetTime.now()), format("Error for PastOrPresent annotation in attribute OffsetTime, generated value: %s, the value needs to be less than actual date", dummy.getPastOrPresentOffsetTime()));
+        assertTrue(dummy.getPastOrPresentOffsetDateTime().isBefore(OffsetDateTime.now()), format("Error for PastOrPresent annotation in attribute OffsetDateTime, generated value: %s, the value needs to be less than actual date", dummy.getPastOrPresentOffsetDateTime()));
+        assertTrue(dummy.getPastOrPresentDate().before(new Date()), format("Error for PastOrPresent annotation in attribute Date, generated value: %s, the value needs to be less than actual date", dummy.getPastOrPresentDate()));
+
+        assertTrue(dummy.getPositiveInt() > 0);
+        assertTrue(dummy.getPositiveDouble() > 0);
+        assertTrue(dummy.getPositiveLong() > 0);
+        assertTrue(dummy.getPositiveBigDecimal().compareTo(BigDecimal.ZERO) > 0);
+        assertTrue(Integer.parseInt(dummy.getPositiveString()) > 0);
+
+        assertTrue(dummy.getPositiveOrZeroInt() > 0);
+        assertTrue(dummy.getPositiveOrZeroDouble() > 0);
+        assertTrue(dummy.getPositiveOrZeroLong() > 0);
+        assertTrue(dummy.getPositiveOrZeroBigDecimal().compareTo(BigDecimal.ZERO) > 0);
+        assertTrue(Integer.parseInt(dummy.getPositiveOrZeroString()) > 0);
+
+        assertTrue(dummy.getNegativeInt() < 0);
+        assertTrue(dummy.getNegativeDouble() < 0);
+        assertTrue(dummy.getNegativeLong() < 0);
+        assertTrue(Integer.parseInt(dummy.getNegativeString()) < 0);
+        assertTrue(dummy.getNegativeBigDecimal().compareTo(BigDecimal.ZERO) < 0);
+        assertTrue(Integer.parseInt(dummy.getComplexType().getNegativeString()) < 0);
+
+        assertTrue(dummy.getNegativeOrZeroInt() < 0);
+        assertTrue(dummy.getNegativeOrZeroDouble() < 0);
+        assertTrue(dummy.getNegativeOrZeroLong() < 0);
+        assertTrue(Integer.parseInt(dummy.getNegativeOrZeroString()) < 0);
+        assertTrue(dummy.getNegativeOrZeroBigDecimal().compareTo(BigDecimal.ZERO) < 0);
+
+        assertTrue(dummy.getFutureLocalDateTime().isAfter(LocalDateTime.now()), format("Error for Future annotation in attribute LocalDateTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureLocalDateTime()));
+        assertTrue(dummy.getFutureInstant().isAfter(Instant.now()), format("Error for Future annotation in attribute Instant, generated value: %s, the value needs to be grander than actual date", dummy.getFutureInstant()));
+        assertTrue(dummy.getFutureOffsetDateTime().isAfter(OffsetDateTime.now()), format("Error for Future annotation in attribute OffsetDateTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOffsetDateTime()));
+        assertTrue(dummy.getFutureZonedDateTime().isAfter(ZonedDateTime.now()), format("Error for Future annotation in attribute ZonedDateTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureZonedDateTime()));
+        assertTrue(dummy.getFutureLocalDate().isAfter(LocalDate.now()), format("Error for Future annotation in attribute LocalDate, generated value: %s, the value needs to be grander than actual date", dummy.getFutureLocalDate()));
+        assertTrue(dummy.getFutureLocalTime().isAfter(LocalTime.now()), format("Error for Future annotation in attribute LocalTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureLocalTime()));
+        assertTrue(dummy.getFutureOffsetTime().isAfter(OffsetTime.now()), format("Error for Future annotation in attribute OffsetTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOffsetTime()));
+        assertTrue(dummy.getFutureDate().after(new Date()), format("Error for Future annotation in attribute Date, generated value: %s, the value needs to be grander than actual date", dummy.getFutureDate()));
+        assertNotNull(dummy.getFutureDateString(), "Error for Future annotation in attribute String");
+        assertTrue(dummy.getComplexType().getDeepestType().getFutureLocalDateTime().isAfter(LocalDateTime.now()), format("Error for Future annotation in attribute ComplexType.DeepestType.LocalDateTime, generated value: %s, the value needs to be grander than actual date", dummy.getComplexType().getDeepestType().getFutureLocalDateTime()));
+
+        assertTrue(dummy.getFutureOrPresentLocalDateTime().isAfter(LocalDateTime.now()), format("Error for FutureOrPresent annotation in attribute LocalDateTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOrPresentLocalDateTime()));
+        assertTrue(dummy.getFutureOrPresentInstant().isAfter(Instant.now()), format("Error for FutureOrPresent annotation in attribute Instant, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOrPresentInstant()));
+        assertTrue(dummy.getFutureOrPresentOffsetDateTime().isAfter(OffsetDateTime.now()), format("Error for FutureOrPresent annotation in attribute OffsetDateTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOrPresentOffsetDateTime()));
+        assertTrue(dummy.getFutureOrPresentZonedDateTime().isAfter(ZonedDateTime.now()), format("Error for FutureOrPresent annotation in attribute ZonedDateTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOrPresentZonedDateTime()));
+        assertTrue(dummy.getFutureOrPresentLocalDate().isAfter(LocalDate.now()), format("Error for FutureOrPresent annotation in attribute LocalDate, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOrPresentLocalDate()));
+        assertTrue(dummy.getFutureOrPresentLocalTime().isAfter(LocalTime.now()), format("Error for FutureOrPresent annotation in attribute LocalTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOrPresentLocalTime()));
+        assertTrue(dummy.getFutureOrPresentOffsetTime().isAfter(OffsetTime.now()), format("Error for FutureOrPresent annotation in attribute OffsetTime, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOrPresentOffsetTime()));
+        assertTrue(dummy.getFutureOrPresentDate().after(new Date()), format("Error for FutureOrPresent annotation in attribute Date, generated value: %s, the value needs to be grander than actual date", dummy.getFutureOrPresentDate()));
+        assertNotNull(dummy.getFutureOrPresentDateString(), "Error for FutureOrPresent annotation in attribute String");
+
+        assertTrue(dummy.getEmailString().matches(EMAIL_REGEX));
+        assertNotNull(dummy.getDigitsWithIntegerAndFractionBigDecimal());
+
+        assertTrue(dummy.getDecimalMinDouble().toString().matches(REGEX_THREE_DIGTS_AFTER_POINT));
+        assertTrue(dummy.getDecimalMinString().matches(REGEX_THREE_DIGTS_AFTER_POINT));
+        assertTrue(dummy.getDecimalMinBigDecimal().toString().matches(REGEX_THREE_DIGTS_AFTER_POINT));
+
+        assertTrue(dummy.getDecimalMaxDouble().toString().matches(REGEX_THREE_DIGITS_BEFORE_POINT));
+        assertTrue(dummy.getDecimalMaxString().matches(REGEX_SIZE_THREE));
+        assertTrue(dummy.getDecimalMaxBigDecimal().toString().matches(REGEX_SIZE_THREE));
+        assertTrue(dummy.getDecimalMaxInteger().toString().matches(REGEX_SIZE_THREE));
+        assertTrue(String.valueOf(dummy.getDecimalMaxLong()).matches(REGEX_SIZE_THREE));
+
+        assertNotNull(dummy.getBigDecimal());
+        assertTrue(dummy.getDigitsWithIntegerAndFractionBigDecimal().toString().matches(FIVE_TWO_DECIMAL_REGEX));
+        assertTrue(dummy.getDigitsWithIntegerAndFractionString().matches(FIVE_TWO_DECIMAL_REGEX));
+        assertTrue(dummy.getDigitsWithIntegerAndFractionDouble().toString().matches(FIVE_TWO_DECIMAL_REGEX));
+        assertTrue(dummy.getDigitsWithIntegerAndFractionLong().toString().matches(REGEX_SIZE_THREE));
+        assertTrue(dummy.getDigitsWithIntegerAndFractionInt().toString().matches(REGEX_SIZE_THREE));
+
+        assertTrue(dummy.getMinInteger() >= 2);
+        assertTrue(dummy.getMinDouble() >= 2);
+        assertTrue(dummy.getMinLong() >= 2);
+        assertTrue(dummy.getMinBigDecimal().longValue() >= 2);
+        assertTrue(Long.parseLong(dummy.getMinString()) >= 2);
+
+        assertTrue(dummy.getMaxInteger() <= 10);
+        assertTrue(dummy.getMaxLong() <= 10);
+        assertTrue(dummy.getMaxDouble() <= 10);
+        assertTrue(dummy.getMaxBigDecimal().longValue() <= 10);
+        assertTrue(Long.parseLong(dummy.getMaxString()) <= 10);
+    }
     @Test
     void shouldIgnore_String_Field() {
         customFields.put("String", null);
@@ -104,7 +226,7 @@ class GenericFixtureTest {
     void shouldIgnore_ComplexType_And_String_Field() {
         customFields.put("ComplexType", null);
         customFields.put("String", null);
-        Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class,customFields);
+        Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
         assertNull(dummyWithIgnoredFields.getComplexType());
         assertNull(dummyWithIgnoredFields.getString());
@@ -243,7 +365,7 @@ class GenericFixtureTest {
         customFields.put("ComplexType", complexType);
         customFields.put("String", NAME);
 
-        Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class,customFields);
+        Dummy dummyWithIgnoredFields = GenericFixture.generate(Dummy.class, customFields);
 
         assertEquals(complexType.getDeepestType(), dummyWithIgnoredFields.getComplexType().getDeepestType());
         assertEquals(complexType.getString(), dummyWithIgnoredFields.getComplexType().getString());
@@ -345,7 +467,7 @@ class GenericFixtureTest {
         DummyWithArgsContructors dummyWithArgsContructors = GenericFixture.generate(DummyWithArgsContructors.class);
 
         assertNotNull(dummyWithArgsContructors.getName());
-        assertNotNull(dummyWithArgsContructors.getNumber());
+        assertNotEquals(dummyWithArgsContructors.getNumber(), 0);
         assertNotNull(dummyWithArgsContructors.getAnyLong());
         assertNotNull(dummyWithArgsContructors.getAnyDouble());
         assertNotNull(dummyWithArgsContructors.getComplexType().getBoolean());
@@ -366,7 +488,7 @@ class GenericFixtureTest {
 
         assertEquals(NAME, dummyWithArgsContructors.getName());
         assertNull(dummyWithArgsContructors.getAnyLong());
-        assertNotNull(dummyWithArgsContructors.getNumber());
+        assertNotEquals(dummyWithArgsContructors.getNumber(), 0);
         assertNotNull(dummyWithArgsContructors.getAnyDouble());
         assertNotNull(dummyWithArgsContructors.getComplexType().getBoolean());
         assertNotNull(dummyWithArgsContructors.getComplexType().getString());
