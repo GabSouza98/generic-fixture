@@ -10,8 +10,5 @@
         <module name="generic-fixture" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="GenericFixture" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>

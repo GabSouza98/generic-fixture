@@ -110,7 +110,7 @@ public class GenericFixture {
             T type;
 
             if (hasNoArgsConstructor(clazz)) {
-                type = clazz.getDeclaredConstructor().newInstance(); //vem tudo nulo
+                type = clazz.getDeclaredConstructor().newInstance();
             } else {
                 type = getInstanceForConstructorWithLessArguments(clazz);
             }
