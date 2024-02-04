@@ -580,7 +580,7 @@ public class GenericFixture {
 
     private static boolean isComplexClass(Class<?> clazz) {
         if (nonNull(clazz.getPackage())) {
-            return !clazz.getPackage().getName().startsWith("java");
+            return !clazz.getPackageName().startsWith("java");
         }
 
         return false;

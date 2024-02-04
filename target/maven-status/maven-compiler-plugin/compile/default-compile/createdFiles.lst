@@ -1,9 +1,10 @@
-domain\DeepestType$DeepestTypeBuilder.class
 domain\DummyWithArgsContructors.class
+domain\DeepestType$DeepestTypeBuilder.class
 generic\fixture\GenericFixture.class
 utils\UtilsDate.class
 exceptions\ClassNotImplementedYet.class
 domain\Dummy$DummyBuilder.class
+domain\TwoAnnotations.class
 exceptions\AnnotationNotImplementedYet.class
 utils\UpdateIgnoredFields.class
 enums\CustomEnum.class
@@ -15,4 +16,6 @@ exceptions\NoArgsConstructorException.class
 utils\UtilsAnnotations.class
 domain\ComplexType$ComplexTypeBuilder.class
 enums\AnnotationsEnum.class
+exceptions\TypeNotRecognizedException.class
 domain\DeepestType.class
+domain\ClassWithAllArgumentsConstructor.class
