@@ -190,7 +190,7 @@ public class GenericFixture {
         return customFields.keySet().stream().anyMatch(f -> f.equals(currentPath));
     }
 
-    public static String handleAttributesPath(String fieldName, String attributesPath) {
+    private static String handleAttributesPath(String fieldName, String attributesPath) {
         if (attributesPath.isEmpty()) {
             //First iteration, no recursion
             return fieldName;
