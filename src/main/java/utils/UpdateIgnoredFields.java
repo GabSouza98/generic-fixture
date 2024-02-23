@@ -16,8 +16,8 @@ public class UpdateIgnoredFields {
      * If the original string doesn't contain any dots, an empty Arraylist
      * will be returned.
      *
-     * @param ignoredFields -> List containing String in the "A.B.C" format
-     * @return -> Updated list without first word before dot
+     * @param ignoredFields - List containing String in the "A.B.C" format
+     * @return - Updated list without first word before dot
      */
 
     public static List<String> update(List<String> ignoredFields, String fieldName) {

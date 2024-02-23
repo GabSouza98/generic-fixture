@@ -110,7 +110,7 @@ public class GenericFixture {
             T type;
 
             if (hasNoArgsConstructor(clazz)) {
-                type = clazz.getDeclaredConstructor().newInstance(); //vem tudo nulo
+                type = clazz.getDeclaredConstructor().newInstance();
             } else {
                 type = getInstanceForConstructorWithLessArguments(clazz);
             }
@@ -190,7 +190,7 @@ public class GenericFixture {
         return customFields.keySet().stream().anyMatch(f -> f.equals(currentPath));
     }
 
-    public static String handleAttributesPath(String fieldName, String attributesPath) {
+    private static String handleAttributesPath(String fieldName, String attributesPath) {
         if (attributesPath.isEmpty()) {
             //First iteration, no recursion
             return fieldName;
@@ -580,7 +580,7 @@ public class GenericFixture {
 
     private static boolean isComplexClass(Class<?> clazz) {
         if (nonNull(clazz.getPackage())) {
-            return !clazz.getPackage().getName().startsWith("java");
+            return !clazz.getPackageName().startsWith("java");
         }
 
         return false;
