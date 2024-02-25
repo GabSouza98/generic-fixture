@@ -1,3 +1,5 @@
+package generic.fixture;
+
 import domain.ComplexType;
 import domain.Dummy;
 import domain.DummyWithArgsContructors;

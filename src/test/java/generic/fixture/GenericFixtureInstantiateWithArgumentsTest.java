@@ -1,3 +1,5 @@
+package generic.fixture;
+
 import domain.ClassWithAllArgumentsConstructor;
 import domain.Dummy;
 import domain.DummyWithArgsContructors;
