@@ -55,7 +55,7 @@ Person(name=fkosbOWEFF, email=YMZ@email.com, age=5, address=gBpTpqg57w, gender=M
 
 It's possible to customize any attribute in generation.
 
-To do this, it is necessary to use a HashMap whose key value is the name of the attribute and the key value is customized, as shown in the example below.
+To do this, it is necessary to use a HashMap whose **key** is the name of the attribute and the **value** is customized, as shown in the example below.
 
 ``` Java
 HashMap<String, Object> customFields = new HashMap<>();
