@@ -2,7 +2,7 @@ package enums;
 
 public enum CustomEnum {
 
-    HIG("highest"),
+    HIGH("highest"),
     MEDIUM("medium"),
     LOW("lowest");
 
