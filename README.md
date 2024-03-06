@@ -80,3 +80,57 @@ This way, the Person instance had the fields below customized:
 - age: null
 - pet.name: Jack
 
+
+## Supported Annotations
+
+Accepted annotations from jakarta.validation.constraints
+
+* @Pattern: _The generation respect the regexp expression in this annotation._
+* @Email
+* @Size
+* @Min
+* @Max
+* @Digits
+* @DecimalMin
+* @DecimalMax
+* @Past
+* @Future
+* @PastOrPresent
+* @FutureOrPresent
+* @Negative
+* @Positive
+* @PositiveOrZero
+* @NegativeOrZero
+
+## Currently Supported Java Types:
+
+* Long / long
+* Integer / int
+* Double / double
+* Boolean / boolean
+* Character / char
+* String
+* UUID
+* LocalDateTime
+* OffsetDateTime
+* Instant
+* ZonedDateTime
+* LocalDate
+* LocalTime
+* OffsetTime
+* ChronoLocalDate
+* ChronoLocalDateTime
+* ChronoZonedDateTime
+* List
+* Queue
+* Deque
+* Set
+* SortedSet
+* Map
+* AbstractMap
+* SortedMap
+* NavigableMap
+* TreeMap
+* Dictionary
+
+## How it works
