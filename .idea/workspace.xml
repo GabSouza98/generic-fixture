@@ -4,11 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a4b39ac8-0eac-4662-b4e9-28c724852734" name="Changes" comment="" />
+    <list default="true" id="a4b39ac8-0eac-4662-b4e9-28c724852734" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/generic/fixture/GenericFixture.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/generic/fixture/GenericFixture.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/domain/Dummy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/domain/Dummy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/generic/fixture/GenericFixtureTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/generic/fixture/GenericFixtureTest.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -28,20 +41,39 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "JUnit.All in generic-fixture.executor": "Run",
+    "JUnit.DomainMapErrorTest.shouldNotGenerateWhenKeyOfMapIsClassNotImplementsComparable.executor": "Run",
+    "JUnit.GenericFixtureTest.executor": "Coverage",
+    "JUnit.GenericFixtureTest.isArray.executor": "Run",
+    "JUnit.GenericFixtureTest.person.executor": "Run",
+    "JUnit.GenericFixtureTest.shouldGenerateWithArrayAttributes.executor": "Run",
+    "JUnit.GenericFixtureTest.shouldNotGenerateWhenKeyOfMapIsClassNotImplementsComparable.executor": "Run",
+    "JUnit.GenericFixtureTest.shouldTestFieldWithAnnotations.executor": "Run",
+    "JUnit.GenericFixtureTest.shouldThrowsExceptionWhenClassIsNotImplementadOnGenericFixture.executor": "Coverage",
+    "JUnit.GenericFixtureTest.shouldValidateAllFields.executor": "Coverage",
+    "JUnit.java in generic-fixture.executor": "Run",
+    "Maven.generic-fixture [clean,deploy,-P,release].executor": "Run",
+    "Maven.generic-fixture [clean,install].executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "encapsular-classes",
+    "git-widget-placeholder": "fixture-array",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "G:/Outros computadores/Meu laptop/Bruno/Workspace/Email/email-service",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "configurable.group.build",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="G:\Outros computadores\Meu laptop\Bruno\Projetos\generic-fixture\.idea" />
+    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="utils" />
       <recent name="enums" />
@@ -49,18 +81,99 @@
       <recent name="generic.fixture" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="All in generic-fixture" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn clean deploy -P release " />
+      <command value="mvn clean install" />
+    </option>
+  </component>
+  <component name="RunManager" selected="JUnit.GenericFixtureTest.shouldTestFieldWithAnnotations">
+    <configuration name="GenericFixtureTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="generic-fixture" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="generic.fixture.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="generic.fixture" />
+      <option name="MAIN_CLASS_NAME" value="generic.fixture.GenericFixtureTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GenericFixtureTest.shouldGenerateWithArrayAttributes" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="generic-fixture" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="generic.fixture.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="generic.fixture" />
+      <option name="MAIN_CLASS_NAME" value="generic.fixture.GenericFixtureTest" />
+      <option name="METHOD_NAME" value="shouldGenerateWithArrayAttributes" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GenericFixtureTest.shouldTestFieldWithAnnotations" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="generic-fixture" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="generic.fixture.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="generic.fixture" />
+      <option name="MAIN_CLASS_NAME" value="generic.fixture.GenericFixtureTest" />
+      <option name="METHOD_NAME" value="shouldTestFieldWithAnnotations" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GenericFixtureTest.shouldThrowsExceptionWhenClassIsNotImplementadOnGenericFixture" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="generic-fixture" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="generic.fixture.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="generic.fixture" />
+      <option name="MAIN_CLASS_NAME" value="generic.fixture.GenericFixtureTest" />
+      <option name="METHOD_NAME" value="shouldThrowsExceptionWhenClassIsNotImplementadOnGenericFixture" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GenericFixtureTest.shouldValidateAllFields" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="generic-fixture" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="generic.fixture.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="generic.fixture" />
+      <option name="MAIN_CLASS_NAME" value="generic.fixture.GenericFixtureTest" />
+      <option name="METHOD_NAME" value="shouldValidateAllFields" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.All in generic-fixture" />
+        <item itemvalue="JUnit.GenericFixtureTest.shouldTestFieldWithAnnotations" />
+        <item itemvalue="JUnit.GenericFixtureTest" />
+        <item itemvalue="JUnit.GenericFixtureTest.shouldGenerateWithArrayAttributes" />
+        <item itemvalue="JUnit.GenericFixtureTest.shouldThrowsExceptionWhenClassIsNotImplementadOnGenericFixture" />
+        <item itemvalue="JUnit.GenericFixtureTest.shouldValidateAllFields" />
       </list>
     </recent_temporary>
   </component>
@@ -68,6 +181,7 @@
     <attachedChunks>
       <set>
         <option value="jdk-11.0.22-corretto-11.0.22-f644763e9732-4a89cc43" />
+        <option value="jdk-21.0.2-openjdk-21.0.2-f644763e9732-c0c073db" />
       </set>
     </attachedChunks>
   </component>
@@ -80,11 +194,89 @@
       <option name="presentableId" value="Default" />
       <updated>1708886758203</updated>
       <workItem from="1708886761143" duration="100000" />
-      <workItem from="1708886869960" duration="1240000" />
+      <workItem from="1708886869960" duration="3180000" />
+      <workItem from="1709080621268" duration="2718000" />
+      <workItem from="1709123698681" duration="3100000" />
+      <workItem from="1709592688166" duration="1755000" />
+      <workItem from="1709601965855" duration="1595000" />
+      <workItem from="1709682500533" duration="5985000" />
+      <workItem from="1709934208632" duration="608000" />
+      <workItem from="1709997581201" duration="8601000" />
+      <workItem from="1710079697409" duration="5510000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/generic/fixture/GenericFixtureTest.java</url>
+          <line>46</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/generic/fixture/GenericFixture.java</url>
+          <line>148</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/generic/fixture/GenericFixture.java</url>
+          <line>161</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/generic/fixture/GenericFixtureTest.java</url>
+          <line>538</line>
+          <option name="timeStamp" value="64" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/generic/fixture/GenericFixture.java</url>
+          <line>546</line>
+          <option name="timeStamp" value="65" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/generic/fixture/GenericFixture.java</url>
+          <line>536</line>
+          <option name="timeStamp" value="69" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/generic/fixture/GenericFixture.java</url>
+          <line>549</line>
+          <option name="timeStamp" value="71" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/generic/fixture/GenericFixtureTest.java</url>
+          <line>187</line>
+          <option name="timeStamp" value="74" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="java.lang.Class" memberName="classLoader" />
+      </pinned-members>
+    </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="JUnit">
+        <watch expression="fieldType" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Generic_fixture$GenericFixtureTest_shouldGenerateWithArrayAttributes.ic" NAME="GenericFixtureTest.shouldGenerateWithArrayAttributes Coverage Results" MODIFIED="1710082277742" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>generic.fixture.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Generic_fixture$GenericFixtureTest.ic" NAME="GenericFixtureTest Coverage Results" MODIFIED="1710084016283" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>generic.fixture.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Generic_fixture$GenericFixtureTest_shouldThrowsExceptionWhenClassIsNotImplementadOnGenericFixture.ic" NAME="GenericFixtureTest.shouldThrowsExceptionWhenClassIsNotImplementadOnGenericFixture Coverage Results" MODIFIED="1710083890784" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>generic.fixture.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Generic_fixture$GenericFixtureTest_shouldValidateAllFields.ic" NAME="GenericFixtureTest.shouldValidateAllFields Coverage Results" MODIFIED="1710083575491" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>generic.fixture.*</FILTER>
+    </SUITE>
   </component>
 </project>

@@ -20,11 +20,12 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
-import utils.UtilsDate;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -128,12 +129,11 @@ public class GenericFixture {
 
                 String currentPath = handleAttributesPath(fieldName, attributesPath);
 
-                if (!customFields.isEmpty() && isCustomField(customFields, currentPath)) {
+                if (nonNull(customFields) && !customFields.isEmpty() && isCustomField(customFields, currentPath)) {
                     field.set(type, customFields.get(currentPath));
                     customFields.remove(currentPath); //This line is optional
                     continue;
                 }
-
                 //Only set field value if not already defined.
                 if (isNull(field.get(type)) || field.getType().isPrimitive()) {
                     Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
@@ -145,7 +145,7 @@ public class GenericFixture {
             return type;
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("\nError ocurred ".concat(e.toString()));
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -535,15 +535,32 @@ public class GenericFixture {
             for (int i = 0; i < 1; i++) {
                 Object key = getObjectByClass(innerClasses[0], customFields, currentPath);
                 Object value = getObjectByClass(innerClasses[1], customFields, currentPath);
-
-                map.put(key, value);
+                try {
+                    map.put(key, value);
+                } catch (ClassCastException e) {
+                    System.out.printf("\nIt's necessary implements interface Comparable<?> in class of Key on the Map: %s ", type.toString());
+                    throw new ClassCastException("It's necessary implements interface Comparable<?> in class of Key on the Map: ".concat(type.toString()));
+                }
             }
 
             return map;
         }
 
+        if (fieldType.isArray()) {
+            Object array = Array.newInstance(fieldType.getComponentType(), 1);
+            if(implementsMap(fieldType.getComponentType()) || isDictionary(fieldType.getComponentType())) {
+                Type typeMap = (((GenericArrayType) type).getGenericComponentType()); //This cast is necessary to parse Map<key,value>[] to Map<key,value>
+              //  Array.set(array, 0, getObjectByClass(fieldType.getComponentType(), customFields, currentPath, typeMap));
+                Array.set(array, 0, getRandomForType(fieldType.getComponentType(), typeMap, new HashMap<>(), customFields, currentPath));
+            } else {
+                Array.set(array, 0, getObjectByClass(fieldType.getComponentType(), customFields, currentPath));
+            }
+            return array;
+        }
+
         throw new TypeNotRecognizedException(fieldType.getTypeName());
     }
+
 
     private static boolean implementsCollection(Class<?> fieldType) {
         return Collection.class.isAssignableFrom(fieldType);
@@ -572,7 +589,7 @@ public class GenericFixture {
     }
 
     private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath) throws Exception {
-        return isComplexClass(innerClass) ?
+        return isComplexClass(innerClass) && !innerClass.isEnum() ?
                 generate(innerClass, customFields, currentPath) :
                 getRandomForType(innerClass, null, new HashMap<>(), null, currentPath);
     }
