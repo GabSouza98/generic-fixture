@@ -535,12 +535,7 @@ public class GenericFixture {
             for (int i = 0; i < 1; i++) {
                 Object key = getObjectByClass(innerClasses[0], customFields, currentPath);
                 Object value = getObjectByClass(innerClasses[1], customFields, currentPath);
-                try {
-                    map.put(key, value);
-                } catch (ClassCastException e) {
-                    System.out.printf("\nIt's necessary implements interface Comparable<?> in class of Key on the Map: %s ", type.toString());
-                    throw new ClassCastException("It's necessary implements interface Comparable<?> in class of Key on the Map: ".concat(type.toString()));
-                }
+                tryPutOnMap(type, map, key, value);
             }
 
             return map;
@@ -550,8 +545,7 @@ public class GenericFixture {
             Object array = Array.newInstance(fieldType.getComponentType(), 1);
             if(implementsMap(fieldType.getComponentType()) || isDictionary(fieldType.getComponentType())) {
                 Type typeMap = (((GenericArrayType) type).getGenericComponentType()); //This cast is necessary to parse Map<key,value>[] to Map<key,value>
-              //  Array.set(array, 0, getObjectByClass(fieldType.getComponentType(), customFields, currentPath, typeMap));
-                Array.set(array, 0, getRandomForType(fieldType.getComponentType(), typeMap, new HashMap<>(), customFields, currentPath));
+                Array.set(array, 0, getRandomForType(fieldType.getComponentType(), typeMap, hashMap, customFields, currentPath));
             } else {
                 Array.set(array, 0, getObjectByClass(fieldType.getComponentType(), customFields, currentPath));
             }
@@ -559,6 +553,15 @@ public class GenericFixture {
         }
 
         throw new TypeNotRecognizedException(fieldType.getTypeName());
+    }
+
+    private static void tryPutOnMap(Type type, Map<Object, Object> map, Object key, Object value) {
+        try {
+            map.put(key, value);
+        } catch (ClassCastException e) {
+            System.out.printf("\nIt's necessary implements interface Comparable<?> in class of Key on the Map: %s ", type.toString());
+            throw new ClassCastException("It's necessary implements interface Comparable<?> in class of Key on the Map: ".concat(type.toString()));
+        }
     }
 
 
