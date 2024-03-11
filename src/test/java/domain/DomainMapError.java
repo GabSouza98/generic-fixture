@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 @Getter
 @Setter
@@ -17,8 +18,7 @@ import java.util.Map;
 @ToString
 public class DomainMapError {
 
-    private Map<ComplexType, Integer>[] arrayMapComplexyTypeInteger;
-    private Map<ComplexType, String>[] arrayMapComplexyTypeString;
-    private Map<ComplexType, ComplexType>[] arrayMapComplexyTypeComplexyType;
+    private TreeMap<ComplexType, Integer>[] treeMapComplexTypeInteger;
+
 
 }

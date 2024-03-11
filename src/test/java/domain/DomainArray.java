@@ -14,12 +14,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -56,6 +51,7 @@ public class DomainArray {
     private Map<Character, BigDecimal>[] arrayMapCharacterBigDecimal;
     private Map<Integer, ComplexType>[] arrayMapIntegerComplexyType;
     private Map<String, ComplexType>[] arrayMapStringComplexyType;
+    private Map<ComplexType, String>[] arrayMapComplexyTypeString;
     private HashMap<Integer, Integer>[] arrayHashMapIntegerInteger;
     private HashMap<String, Integer>[] arrayHashMapStringInteger;
     private HashMap<String, CustomEnum>[] arrayHashMapStringCustomEnum;
@@ -72,4 +68,5 @@ public class DomainArray {
     private Dictionary<Character, BigDecimal>[] arrayDictionaryCharacterBigDecimal;
     private Dictionary<Integer, ComplexType>[] arrayDictionaryIntegerComplexyType;
     private Dictionary<String, ComplexType>[] arrayDictionaryStringComplexyType;
+    private TreeMap<Integer, String>[] arrayTreeMapIntegerString;
 }

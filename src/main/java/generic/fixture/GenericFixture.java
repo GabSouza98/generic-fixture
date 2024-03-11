@@ -65,6 +65,9 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 import static enums.AnnotationsEnum.DECIMAL_MAX;
@@ -96,18 +99,26 @@ public class GenericFixture {
     static SecureRandom random = new SecureRandom();
 
     public static <T> T generate(Class<T> clazz) {
-        return doGenerate(clazz, new HashMap<>(), "");
+        return doGenerate(clazz, new HashMap<>(), "", 1);
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) {
-        return doGenerate(clazz, customFields, "");
+        return doGenerate(clazz, customFields, "", 1);
     }
 
-    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) {
-        return doGenerate(clazz, customFields, attributesPath);
+    public static <T> T generate(Class<T> clazz, Integer numberOfItens) {
+        return doGenerate(clazz, new HashMap<>(), "", numberOfItens);
     }
 
-    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath) {
+    public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItens) {
+        return doGenerate(clazz, customFields, "", numberOfItens);
+    }
+
+    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItens) {
+        return doGenerate(clazz, customFields, attributesPath, numberOfItens);
+    }
+
+    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItens) {
 
         try {
 
@@ -116,7 +127,7 @@ public class GenericFixture {
             if (hasNoArgsConstructor(clazz)) {
                 type = clazz.getDeclaredConstructor().newInstance();
             } else {
-                type = getInstanceForConstructorWithLessArguments(clazz);
+                type = getInstanceForConstructorWithLessArguments(clazz, numberOfItens);
             }
 
             Field[] fields = type.getClass().getDeclaredFields();
@@ -137,7 +148,7 @@ public class GenericFixture {
                 //Only set field value if not already defined.
                 if (isNull(field.get(type)) || field.getType().isPrimitive()) {
                     Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath);
+                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath, numberOfItens);
                     field.set(type, result);
                 }
             }
@@ -157,7 +168,7 @@ public class GenericFixture {
                 .collect(Collectors.toList());
     }
 
-    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz) throws Exception {
+    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz, Integer numberOfItens) throws Exception {
 
         Constructor<?>[] constructors = clazz.getConstructors();
 
@@ -178,7 +189,7 @@ public class GenericFixture {
 
             if (parameterTypes[i].isPrimitive()) {
                 //Generates a value for each primitive argument
-                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "");
+                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "", numberOfItens);
             } else {
                 arguments[i] = null;
             }
@@ -278,7 +289,8 @@ public class GenericFixture {
                                            Type type,
                                            Map<AnnotationsEnum, Annotation> hashMap,
                                            Map<String, Object> customFields,
-                                           String currentPath) throws Exception {
+                                           String currentPath,
+                                           Integer numberOfItens) throws Exception {
 
         if (fieldType == String.class) {
             String string = RandomStringUtils.randomAlphanumeric(10);
@@ -306,14 +318,14 @@ public class GenericFixture {
             }
 
             if (hashMap.containsKey(POSITIVE)
-                    || hashMap.containsKey(POSITIVE_OR_ZERO)
-                    || hashMap.containsKey(NEGATIVE)
-                    || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                    || hashMap.containsKey(DECIMAL_MIN)
-                    || hashMap.containsKey(DECIMAL_MAX)
-                    || hashMap.containsKey(DIGITS)
-                    || hashMap.containsKey(MIN)
-                    || hashMap.containsKey(MAX)) {
+                || hashMap.containsKey(POSITIVE_OR_ZERO)
+                || hashMap.containsKey(NEGATIVE)
+                || hashMap.containsKey(NEGATIVE_OR_ZERO)
+                || hashMap.containsKey(DECIMAL_MIN)
+                || hashMap.containsKey(DECIMAL_MAX)
+                || hashMap.containsKey(DIGITS)
+                || hashMap.containsKey(MIN)
+                || hashMap.containsKey(MAX)) {
                 string = returnValueByPattern(hashMap).toString();
             }
 
@@ -321,14 +333,14 @@ public class GenericFixture {
         }
 
         if (fieldType == Long.class || fieldType == long.class) {
-            if(hashMap.containsKey(DIGITS)
-                    || hashMap.containsKey(POSITIVE)
-                    || hashMap.containsKey(POSITIVE_OR_ZERO)
-                    || hashMap.containsKey(NEGATIVE)
-                    || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                    || hashMap.containsKey(DECIMAL_MAX)
-                    || hashMap.containsKey(MIN)
-                    || hashMap.containsKey(MAX)) {
+            if (hashMap.containsKey(DIGITS)
+                || hashMap.containsKey(POSITIVE)
+                || hashMap.containsKey(POSITIVE_OR_ZERO)
+                || hashMap.containsKey(NEGATIVE)
+                || hashMap.containsKey(NEGATIVE_OR_ZERO)
+                || hashMap.containsKey(DECIMAL_MAX)
+                || hashMap.containsKey(MIN)
+                || hashMap.containsKey(MAX)) {
                 //The transformation to long discards decimal places
                 return returnValueByPattern(hashMap).longValue();
             }
@@ -337,14 +349,14 @@ public class GenericFixture {
         }
 
         if (fieldType == Integer.class || fieldType == int.class) {
-            if(hashMap.containsKey(DIGITS)
-                    || hashMap.containsKey(POSITIVE)
-                    || hashMap.containsKey(POSITIVE_OR_ZERO)
-                    || hashMap.containsKey(NEGATIVE)
-                    || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                    || hashMap.containsKey(DECIMAL_MAX)
-                    || hashMap.containsKey(MIN)
-                    || hashMap.containsKey(MAX)) {
+            if (hashMap.containsKey(DIGITS)
+                || hashMap.containsKey(POSITIVE)
+                || hashMap.containsKey(POSITIVE_OR_ZERO)
+                || hashMap.containsKey(NEGATIVE)
+                || hashMap.containsKey(NEGATIVE_OR_ZERO)
+                || hashMap.containsKey(DECIMAL_MAX)
+                || hashMap.containsKey(MIN)
+                || hashMap.containsKey(MAX)) {
                 return returnValueByPattern(hashMap).intValue();
             }
 
@@ -352,15 +364,15 @@ public class GenericFixture {
         }
 
         if (fieldType == Double.class || fieldType == double.class) {
-            if(hashMap.containsKey(DIGITS)
-                    || hashMap.containsKey(POSITIVE)
-                    || hashMap.containsKey(POSITIVE_OR_ZERO)
-                    || hashMap.containsKey(NEGATIVE)
-                    || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                    || hashMap.containsKey(DECIMAL_MIN)
-                    || hashMap.containsKey(DECIMAL_MAX)
-                    || hashMap.containsKey(MIN)
-                    || hashMap.containsKey(MAX)) {
+            if (hashMap.containsKey(DIGITS)
+                || hashMap.containsKey(POSITIVE)
+                || hashMap.containsKey(POSITIVE_OR_ZERO)
+                || hashMap.containsKey(NEGATIVE)
+                || hashMap.containsKey(NEGATIVE_OR_ZERO)
+                || hashMap.containsKey(DECIMAL_MIN)
+                || hashMap.containsKey(DECIMAL_MAX)
+                || hashMap.containsKey(MIN)
+                || hashMap.containsKey(MAX)) {
                 return returnValueByPattern(hashMap).doubleValue();
             }
 
@@ -391,6 +403,7 @@ public class GenericFixture {
 
         if (implementsTemporal(fieldType)) {
             if (fieldType.isInterface()) {
+
                 if (fieldType == ChronoLocalDate.class) {
                     return LocalDate.now();
                 }
@@ -402,6 +415,7 @@ public class GenericFixture {
                 }
 
             } else {
+
                 if (fieldType == LocalDateTime.class) {
                     if(hasAnnotation(hashMap)) {
                         return returnValueByPatternAndType(hashMap, LocalDateTime.class);
@@ -458,13 +472,13 @@ public class GenericFixture {
             return UUID.randomUUID();
         }
 
+        if (fieldType.isEnum()) {
+            return fieldType.getEnumConstants()[0];
+        }
+
         //Here we can identify what types are not POJOs
         if (isComplexClass(fieldType)) {
-            if (fieldType.isEnum()) {
-                return fieldType.getEnumConstants()[0];
-            } else {
-                return generate(fieldType, customFields, currentPath);
-            }
+            return generate(fieldType, customFields, currentPath, numberOfItens);
         }
 
         if (implementsCollection(fieldType)) {
@@ -498,8 +512,8 @@ public class GenericFixture {
 
             assert collection != null;
 
-            for (int i = 0; i < 1; i++) {
-                Object obj = getObjectByClass(innerClasses[0], customFields, currentPath);
+            for (int i = 0; i < numberOfItens; i++) {
+                Object obj = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItens);
                 collection.add(obj);
             }
 
@@ -508,18 +522,29 @@ public class GenericFixture {
 
         if (implementsMap(fieldType) || isDictionary(fieldType)) {
 
-            Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside List<T>
+            Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside Map<K, V>
             Map<Object, Object> map = null;
 
             if (fieldType.isInterface() || Modifier.isAbstract(fieldType.getModifiers())) {
 
                 //Verify all possible Interfaces/AbstractClasses that extends Map
                 //and choose default implementation
-                if (fieldType == Map.class ||
-                    fieldType == AbstractMap.class ||
-                    fieldType == SortedMap.class ||
-                    fieldType == NavigableMap.class) {
+                if (fieldType == Map.class || fieldType == AbstractMap.class) {
+                    map = new HashMap<>();
+                }
+
+                if (fieldType == ConcurrentHashMap.class) {
+                    map = new ConcurrentHashMap<>();
+                }
+
+                //These types require that all keys inserted must implement the Comparable interface
+                if (fieldType == SortedMap.class || fieldType == NavigableMap.class) {
                     map = new TreeMap<>();
+                }
+
+                //This type require that all keys inserted must implement the Comparable interface
+                if (fieldType == ConcurrentNavigableMap.class) {
+                    map = new ConcurrentSkipListMap<>();
                 }
 
                 if (fieldType == Dictionary.class) {
@@ -532,9 +557,9 @@ public class GenericFixture {
 
             assert map != null;
 
-            for (int i = 0; i < 1; i++) {
-                Object key = getObjectByClass(innerClasses[0], customFields, currentPath);
-                Object value = getObjectByClass(innerClasses[1], customFields, currentPath);
+            for (int i = 0; i < numberOfItens; i++) {
+                Object key = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItens);
+                Object value = getObjectByClass(innerClasses[1], customFields, currentPath, numberOfItens);
                 tryPutOnMap(type, map, key, value);
             }
 
@@ -542,25 +567,36 @@ public class GenericFixture {
         }
 
         if (fieldType.isArray()) {
-            Object array = Array.newInstance(fieldType.getComponentType(), 1);
-            if(implementsMap(fieldType.getComponentType()) || isDictionary(fieldType.getComponentType())) {
-                Type typeMap = (((GenericArrayType) type).getGenericComponentType()); //This cast is necessary to parse Map<key,value>[] to Map<key,value>
-                Array.set(array, 0, getRandomForType(fieldType.getComponentType(), typeMap, hashMap, customFields, currentPath));
-            } else {
-                Array.set(array, 0, getObjectByClass(fieldType.getComponentType(), customFields, currentPath));
+
+            Class<?> arrayType = fieldType.getComponentType();
+            Object array = Array.newInstance(arrayType, numberOfItens);
+
+            for (int i = 0; i < numberOfItens; i++) {
+                if (hasTypeParameters(arrayType)) {
+                    //This cast is necessary to parse Map<K,V>[] to Map<K,V>, os List<E>[] to List<E>
+                    Type genericType = (((GenericArrayType) type).getGenericComponentType());
+                    Array.set(array, i, getRandomForType(arrayType, genericType, hashMap, customFields, currentPath, numberOfItens));
+                } else {
+                    Array.set(array, i, getObjectByClass(arrayType, customFields, currentPath, numberOfItens));
+                }
             }
+
             return array;
         }
 
         throw new TypeNotRecognizedException(fieldType.getTypeName());
     }
 
+    private static boolean hasTypeParameters(Class<?> clazz) {
+        return clazz.getTypeParameters().length > 0;
+    }
+
     private static void tryPutOnMap(Type type, Map<Object, Object> map, Object key, Object value) {
         try {
             map.put(key, value);
         } catch (ClassCastException e) {
-            System.out.printf("\nIt's necessary implements interface Comparable<?> in class of Key on the Map: %s ", type.toString());
-            throw new ClassCastException("It's necessary implements interface Comparable<?> in class of Key on the Map: ".concat(type.toString()));
+            System.out.printf("\nIt's necessary to implement Comparable<?> Interface in Key Class of the Map: %s ", type.toString());
+            throw new ClassCastException("It's necessary to implement Comparable<?> Interface in Key Class of the Map: ".concat(type.toString()));
         }
     }
 
@@ -591,15 +627,15 @@ public class GenericFixture {
         return false;
     }
 
-    private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath) throws Exception {
-        return isComplexClass(innerClass) && !innerClass.isEnum() ?
-                generate(innerClass, customFields, currentPath) :
-                getRandomForType(innerClass, null, new HashMap<>(), null, currentPath);
+    private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath, Integer numberOfItens) throws Exception {
+        return isComplexClass(innerClass) ?
+                generate(innerClass, customFields, currentPath, numberOfItens) :
+                getRandomForType(innerClass, null, new HashMap<>(), null, currentPath, numberOfItens);
     }
 
     private static boolean isComplexClass(Class<?> clazz) {
         if (nonNull(clazz.getPackage())) {
-            return !clazz.getPackageName().startsWith("java");
+            return !clazz.getPackageName().startsWith("java") && !clazz.isEnum();
         }
 
         return false;
