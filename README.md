@@ -88,7 +88,7 @@ The Object passed as **value** in the HashMap must be compatible with the expect
 
 ## Lists, Maps and Arrays
 
-It's possible to determine the number of itens generated inside Fields that contain objects.
+It's possible to determine the number of items generated inside Fields that contain objects.
 Currently, this is implemented for all types of Lists, Maps, and Arrays.
 Consider the following Library class:
 
