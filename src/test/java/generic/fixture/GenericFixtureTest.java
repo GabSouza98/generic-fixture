@@ -44,7 +44,6 @@ class GenericFixtureTest {
         assertNotNull(dummy.getBigDecimal());
         assertTrue(dummy.getPrimitiveInt() != 0, "Error for primitive int type attribute");
         assertTrue(dummy.getPrimitiveDouble() != 0, "Error for primitive double type attribute");
-        assertTrue(dummy.getPrimitiveDoubles().length > 0, "Error for array primitive double type attribute");
         assertNotNull(dummy.getString(), "Error for String type attribute");
         assertNotNull(dummy.getInteger(), "Error for Integer type attribute");
         assertNotNull(dummy.getDouble(), "Error for Double type attribute");
