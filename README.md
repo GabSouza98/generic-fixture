@@ -74,7 +74,7 @@ Since "name" and "age" are in the root of the Person Class, the **key** is direc
 What will be printed in the console will be something similar to:
 
 ```
-Person(name=Fábio Brazza, email=XEI@email.com, age=null, address=3lfeMIP7Hv, gender=MAN, pet=Pet(name=Licudo, breed=Vira lata))
+Person(name=Fábio Brazza, email=XEI@email.com, age=null, address=3lfeMIP7Hv, gender=MAN, pet=Pet(name=Jack, breed=dLKs687jkL))
 ```
 
 This way, the Person instance had the fields below customized:
