@@ -32,17 +32,22 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoLocalDate;
+import java.time.chrono.ChronoLocalDateTime;
+import java.time.chrono.ChronoZonedDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Dictionary;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -67,6 +72,7 @@ public class Dummy {
     private Deque<String> stringList;
     private SortedSet<Character> charList;
     private Queue<Boolean> booleanList;
+    private List<UUID> uuidList;
     private CustomEnum CustomEnum;
     private Map<String, String> stringMap;
     private Dictionary<Integer, Integer> integerMap;
@@ -79,6 +85,11 @@ public class Dummy {
     private LocalTime localTime;
     private OffsetTime offsetTime;
     private Date date;
+    private Instant instant;
+    private ChronoLocalDate chronoLocalDate;
+    private ChronoLocalDateTime chronoLocalDateTime;
+    private ChronoZonedDateTime chronoZonedDateTime;
+    private UUID uuid;
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$")
     private String stringWithDateFormat;

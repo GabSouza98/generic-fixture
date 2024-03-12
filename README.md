@@ -11,7 +11,7 @@ This library can generate an instance of any Class, with random values for each 
 Also, it can generate according to SpringBoot's regular restrictions (spring-boot-starter-validation).
 There's also an option to customize specific fields, if random values are not desired in some cases.
 
-# How to use
+# How to Use
 
 To showcase the usage, the Person Class bellow will be used.
 
@@ -115,7 +115,7 @@ Although not widely used, the generation of fields like Map<K,V>[] it's supporte
 Accepted annotations from jakarta.validation.constraints
 
 ### String Annotations
-* @Pattern: _The generated String satisfies the regexp expression in this annotation._
+* @Pattern: _The generated String satisfies the regexp._
 * @Email: _The generated String satisfies the Email pattern._
 * @Size: _The generated String will have the specified length._
 
@@ -123,14 +123,14 @@ Accepted annotations from jakarta.validation.constraints
 * @Min: _The generated number will be at least the minimum value._
 * @Max: _The generated number will be at most the maximum value._
 * @Digits: _The generated number will have the specified amount of digits._
-* @DecimalMin
-* @DecimalMax
+* @DecimalMin: _The generated number will be higher or equal to the specified minimum._
+* @DecimalMax: _The generated number will be lower or equal to the specified minimum._
 * @Positive: _The generated number will be positive._
 * @Negative: _The generated number will be negative._
 * @PositiveOrZero: _The generated number will be positive or zero._
 * @NegativeOrZero: _The generated number will be negative or zero._
 
-### DateTime Annotations
+### Date/Time Annotations
 * @Past: _The generated date/time will be in the past._
 * @Future: _The generated date/time will be in the future._
 * @PastOrPresent: _The generated date/time will be in the past or equal to present._
