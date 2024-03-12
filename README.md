@@ -1,6 +1,8 @@
 
 # Generic-Fixture
 
+![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.gabsouza98/generic-fixture/badge.svg?style=for-the-badge)
+
 #### Never struggle again with creating random data for your tests.
 
 Library created with the goal of increasing productivity in developing tests in Java.
