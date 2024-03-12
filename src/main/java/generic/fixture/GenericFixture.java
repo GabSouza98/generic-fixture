@@ -573,7 +573,7 @@ public class GenericFixture {
 
             for (int i = 0; i < numberOfItens; i++) {
                 if (hasTypeParameters(arrayType)) {
-                    //This cast is necessary to parse Map<K,V>[] to Map<K,V>, os List<E>[] to List<E>
+                    //This cast is necessary to parse Map<K,V>[] to Map<K,V>, or List<E>[] to List<E>
                     Type genericType = (((GenericArrayType) type).getGenericComponentType());
                     Array.set(array, i, getRandomForType(arrayType, genericType, hashMap, customFields, currentPath, numberOfItens));
                 } else {
