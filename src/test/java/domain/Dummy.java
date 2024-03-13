@@ -59,7 +59,7 @@ public class Dummy {
 
     private int primitiveInt;
     private double primitiveDouble;
-    private ComplexType ComplexType; //attributesPath = ComplexType
+    private ComplexType ComplexType;
     private String String;
     private Long Long;
     private Double Double;

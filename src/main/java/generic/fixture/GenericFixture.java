@@ -66,6 +66,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
@@ -106,19 +107,19 @@ public class GenericFixture {
         return doGenerate(clazz, customFields, "", 1);
     }
 
-    public static <T> T generate(Class<T> clazz, Integer numberOfItens) {
-        return doGenerate(clazz, new HashMap<>(), "", numberOfItens);
+    public static <T> T generate(Class<T> clazz, Integer numberOfItems) {
+        return doGenerate(clazz, new HashMap<>(), "", numberOfItems);
     }
 
-    public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItens) {
-        return doGenerate(clazz, customFields, "", numberOfItens);
+    public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems) {
+        return doGenerate(clazz, customFields, "", numberOfItems);
     }
 
-    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItens) {
-        return doGenerate(clazz, customFields, attributesPath, numberOfItens);
+    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems) {
+        return doGenerate(clazz, customFields, attributesPath, numberOfItems);
     }
 
-    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItens) {
+    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems) {
 
         try {
 
@@ -127,7 +128,7 @@ public class GenericFixture {
             if (hasNoArgsConstructor(clazz)) {
                 type = clazz.getDeclaredConstructor().newInstance();
             } else {
-                type = getInstanceForConstructorWithLessArguments(clazz, numberOfItens);
+                type = getInstanceForConstructorWithLessArguments(clazz, numberOfItems);
             }
 
             Field[] fields = type.getClass().getDeclaredFields();
@@ -148,7 +149,7 @@ public class GenericFixture {
                 //Only set field value if not already defined.
                 if (isNull(field.get(type)) || field.getType().isPrimitive()) {
                     Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath, numberOfItens);
+                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath, numberOfItems);
                     field.set(type, result);
                 }
             }
@@ -168,7 +169,7 @@ public class GenericFixture {
                 .collect(Collectors.toList());
     }
 
-    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz, Integer numberOfItens) throws Exception {
+    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz, Integer numberOfItems) throws Exception {
 
         Constructor<?>[] constructors = clazz.getConstructors();
 
@@ -189,7 +190,7 @@ public class GenericFixture {
 
             if (parameterTypes[i].isPrimitive()) {
                 //Generates a value for each primitive argument
-                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "", numberOfItens);
+                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "", numberOfItems);
             } else {
                 arguments[i] = null;
             }
@@ -290,7 +291,7 @@ public class GenericFixture {
                                            Map<AnnotationsEnum, Annotation> hashMap,
                                            Map<String, Object> customFields,
                                            String currentPath,
-                                           Integer numberOfItens) throws Exception {
+                                           Integer numberOfItems) throws Exception {
 
         if (fieldType == String.class) {
             String string = RandomStringUtils.randomAlphanumeric(10);
@@ -478,7 +479,7 @@ public class GenericFixture {
 
         //Here we can identify what types are not POJOs
         if (isComplexClass(fieldType)) {
-            return generate(fieldType, customFields, currentPath, numberOfItens);
+            return generate(fieldType, customFields, currentPath, numberOfItems);
         }
 
         if (implementsCollection(fieldType)) {
@@ -512,8 +513,8 @@ public class GenericFixture {
 
             assert collection != null;
 
-            for (int i = 0; i < numberOfItens; i++) {
-                Object obj = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItens);
+            for (int i = 0; i < numberOfItems; i++) {
+                Object obj = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItems);
                 collection.add(obj);
             }
 
@@ -533,7 +534,7 @@ public class GenericFixture {
                     map = new HashMap<>();
                 }
 
-                if (fieldType == ConcurrentHashMap.class) {
+                if (fieldType == ConcurrentMap.class) {
                     map = new ConcurrentHashMap<>();
                 }
 
@@ -557,9 +558,9 @@ public class GenericFixture {
 
             assert map != null;
 
-            for (int i = 0; i < numberOfItens; i++) {
-                Object key = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItens);
-                Object value = getObjectByClass(innerClasses[1], customFields, currentPath, numberOfItens);
+            for (int i = 0; i < numberOfItems; i++) {
+                Object key = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItems);
+                Object value = getObjectByClass(innerClasses[1], customFields, currentPath, numberOfItems);
                 tryPutOnMap(type, map, key, value);
             }
 
@@ -569,15 +570,15 @@ public class GenericFixture {
         if (fieldType.isArray()) {
 
             Class<?> arrayType = fieldType.getComponentType();
-            Object array = Array.newInstance(arrayType, numberOfItens);
+            Object array = Array.newInstance(arrayType, numberOfItems);
 
-            for (int i = 0; i < numberOfItens; i++) {
+            for (int i = 0; i < numberOfItems; i++) {
                 if (hasTypeParameters(arrayType)) {
                     //This cast is necessary to parse Map<K,V>[] to Map<K,V>, or List<E>[] to List<E>
                     Type genericType = (((GenericArrayType) type).getGenericComponentType());
-                    Array.set(array, i, getRandomForType(arrayType, genericType, hashMap, customFields, currentPath, numberOfItens));
+                    Array.set(array, i, getRandomForType(arrayType, genericType, hashMap, customFields, currentPath, numberOfItems));
                 } else {
-                    Array.set(array, i, getObjectByClass(arrayType, customFields, currentPath, numberOfItens));
+                    Array.set(array, i, getObjectByClass(arrayType, customFields, currentPath, numberOfItems));
                 }
             }
 
@@ -627,10 +628,10 @@ public class GenericFixture {
         return false;
     }
 
-    private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath, Integer numberOfItens) throws Exception {
+    private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath, Integer numberOfItems) throws Exception {
         return isComplexClass(innerClass) ?
-                generate(innerClass, customFields, currentPath, numberOfItens) :
-                getRandomForType(innerClass, null, new HashMap<>(), null, currentPath, numberOfItens);
+                generate(innerClass, customFields, currentPath, numberOfItems) :
+                getRandomForType(innerClass, null, new HashMap<>(), null, currentPath, numberOfItems);
     }
 
     private static boolean isComplexClass(Class<?> clazz) {
