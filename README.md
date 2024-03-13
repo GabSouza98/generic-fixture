@@ -126,7 +126,7 @@ Accepted annotations from jakarta.validation.constraints
 * @Max: _The generated number will be at most the maximum value._
 * @Digits: _The generated number will have the specified amount of digits._
 * @DecimalMin: _The generated number will be higher or equal to the specified minimum._
-* @DecimalMax: _The generated number will be lowed or equal to the specified minimum._
+* @DecimalMax: _The generated number will be lower or equal to the specified minimum._
 * @Positive: _The generated number will be positive._
 * @Negative: _The generated number will be negative._
 * @PositiveOrZero: _The generated number will be positive or zero._
@@ -211,7 +211,6 @@ Here are the default implementations used:
 * ChronoLocalDateTime
 * ChronoZonedDateTime
 * List
-* ArrayList
 * ArrayList
 * Queue
 * Deque
