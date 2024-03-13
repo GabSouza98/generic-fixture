@@ -1,7 +1,7 @@
 
 # Generic-Fixture
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.gabsouza98/generic-fixture/badge.svg)](https://mvnrepository.com/artifact/io.github.gabsouza98/generic-fixture)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.gabsouza98/generic-fixture/badge.svg?style=for-the-badge)](https://mvnrepository.com/artifact/io.github.gabsouza98/generic-fixture)
 
 #### Never struggle again with creating random data for your tests.
 
