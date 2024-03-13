@@ -191,8 +191,6 @@ Here are the default implementations used:
 
 ## Currently Supported Java Types:
 
-## Currently Supported Java Types:
-
 * Long / long
 * Integer / int
 * Double / double
