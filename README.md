@@ -1,9 +1,8 @@
 
 # Generic-Fixture
 
-![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.gabsouza98/generic-fixture/badge.svg?style=for-the-badge)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.gabsouza98/generic-fixture/badge.svg)](https://mvnrepository.com/artifact/io.github.gabsouza98/generic-fixture)
  
-[URL Maven Repository](https://mvnrepository.com/artifact/io.github.gabsouza98/generic-fixture)
 
 #### Never struggle again with creating random data for your tests.
 
@@ -128,7 +127,7 @@ Accepted annotations from jakarta.validation.constraints
 * @Max: _The generated number will be at most the maximum value._
 * @Digits: _The generated number will have the specified amount of digits._
 * @DecimalMin: _The generated number will be higher or equal to the specified minimum._
-* @DecimalMax: _The generated number will be lower or equal to the specified minimum._
+* @DecimalMax: _The generated number will be lowed or equal to the specified minimum._
 * @Positive: _The generated number will be positive._
 * @Negative: _The generated number will be negative._
 * @PositiveOrZero: _The generated number will be positive or zero._
