@@ -191,6 +191,8 @@ Here are the default implementations used:
 
 ## Currently Supported Java Types:
 
+## Currently Supported Java Types:
+
 * Long / long
 * Integer / int
 * Double / double
@@ -198,9 +200,11 @@ Here are the default implementations used:
 * Character / char
 * String
 * UUID
+* BigDecimal
 * LocalDateTime
 * OffsetDateTime
 * Instant
+* Date
 * ZonedDateTime
 * LocalDate
 * LocalTime
@@ -209,6 +213,8 @@ Here are the default implementations used:
 * ChronoLocalDateTime
 * ChronoZonedDateTime
 * List
+* ArrayList
+* ArrayList
 * Queue
 * Deque
 * Set
@@ -219,3 +225,4 @@ Here are the default implementations used:
 * NavigableMap
 * TreeMap
 * Dictionary
+* Enum
