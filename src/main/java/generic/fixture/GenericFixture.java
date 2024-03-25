@@ -315,7 +315,7 @@ public class GenericFixture {
             }
 
             if (hashMap.containsKey(EMAIL)) {
-                string = new RgxGen(EMAIL.getRegex()).generate();
+                string = new RgxGen("^[a-zA-Z0-9_.]{1,10}@email\\.com$").generate();
             }
 
             if (hashMap.containsKey(POSITIVE)

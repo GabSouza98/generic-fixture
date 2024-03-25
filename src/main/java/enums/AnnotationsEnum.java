@@ -1,12 +1,10 @@
 package enums;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public enum AnnotationsEnum {
     PATTERN,
     SIZE,
@@ -23,8 +21,5 @@ public enum AnnotationsEnum {
     DECIMAL_MAX,
     MIN,
     MAX,
-    EMAIL("^[a-zA-Z0-9_.]{1,10}@email\\.com$");
-
-    private String regex;
-
+    EMAIL;
 }
