@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class GenericFixtureInstantiateWithArgumentsTest {
 
-
     @Test
     void shouldInstantiateSuccess() {
         assertDoesNotThrow(() -> GenericFixture.generate(Dummy.class));

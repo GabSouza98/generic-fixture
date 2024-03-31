@@ -114,8 +114,8 @@ public class GenericFixture {
         return doGenerate(clazz, customFields, "", numberOfItems, new HashSet<Class<?>>());
     }
 
-    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClass) {
-        return doGenerate(clazz, customFields, attributesPath, numberOfItems, visitedClass);
+    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
+        return doGenerate(clazz, customFields, attributesPath, numberOfItems, visitedClasses);
     }
 
     private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClass) {

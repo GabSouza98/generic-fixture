@@ -18,4 +18,5 @@ public class Animal {
     private String name;
     private Person person;
     private PetShop petShop;
+
 }
