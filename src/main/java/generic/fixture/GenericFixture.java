@@ -99,27 +99,19 @@ public class GenericFixture {
     static SecureRandom random = new SecureRandom();
 
     public static <T> T generate(Class<T> clazz) {
-        var visitedClass = new HashSet<Class<?>>();
-        visitedClass.add(clazz);
-        return doGenerate(clazz, new HashMap<>(), "", 1, visitedClass);
+        return doGenerate(clazz, new HashMap<>(), "", 1, new HashSet<Class<?>>());
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) {
-        var visitedClass = new HashSet<Class<?>>();
-        visitedClass.add(clazz);
-        return doGenerate(clazz, customFields, "", 1, visitedClass);
+        return doGenerate(clazz, customFields, "", 1, new HashSet<Class<?>>());
     }
 
     public static <T> T generate(Class<T> clazz, Integer numberOfItems) {
-        var visitedClass = new HashSet<Class<?>>();
-        visitedClass.add(clazz);
-        return doGenerate(clazz, new HashMap<>(), "", numberOfItems, visitedClass);
+        return doGenerate(clazz, new HashMap<>(), "", numberOfItems, new HashSet<Class<?>>());
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems) {
-        var visitedClass = new HashSet<Class<?>>();
-        visitedClass.add(clazz);
-        return doGenerate(clazz, customFields, "", numberOfItems, visitedClass);
+        return doGenerate(clazz, customFields, "", numberOfItems, new HashSet<Class<?>>());
     }
 
     private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClass) {
@@ -129,6 +121,11 @@ public class GenericFixture {
     private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClass) {
 
         try {
+
+            if(isComplexClass(clazz)) {
+                visitedClass.add(clazz);
+            }
+
             T type;
 
             if (hasNoArgsConstructor(clazz)) {
@@ -164,7 +161,7 @@ public class GenericFixture {
                     field.set(type, result);
                 }
             }
-
+            visitedClass.remove(clazz); //Able GenericFixture to generate another attributes for this clazz, because the circular generation will not happen.
             return type;
 
         } catch (Exception e) {

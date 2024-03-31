@@ -1,4 +1,4 @@
-package domain;
+package domain.circular.generation;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Person {
+public class PetShop {
 
-    private String name;
     private List<Animal> animals;
+    private Worker employeed;
 
 }
