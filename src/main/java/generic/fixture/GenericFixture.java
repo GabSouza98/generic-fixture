@@ -96,45 +96,56 @@ import static utils.UtilsBigDecimal.returnValueByPattern;
 import static utils.UtilsDate.returnValueByPatternAndType;
 
 public class GenericFixture {
-
     static SecureRandom random = new SecureRandom();
 
     public static <T> T generate(Class<T> clazz) {
-        return doGenerate(clazz, new HashMap<>(), "", 1);
+        var visitedClass = new HashSet<Class<?>>();
+        visitedClass.add(clazz);
+        return doGenerate(clazz, new HashMap<>(), "", 1, visitedClass);
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) {
-        return doGenerate(clazz, customFields, "", 1);
+        var visitedClass = new HashSet<Class<?>>();
+        visitedClass.add(clazz);
+        return doGenerate(clazz, customFields, "", 1, visitedClass);
     }
 
     public static <T> T generate(Class<T> clazz, Integer numberOfItems) {
-        return doGenerate(clazz, new HashMap<>(), "", numberOfItems);
+        var visitedClass = new HashSet<Class<?>>();
+        visitedClass.add(clazz);
+        return doGenerate(clazz, new HashMap<>(), "", numberOfItems, visitedClass);
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems) {
-        return doGenerate(clazz, customFields, "", numberOfItems);
+        var visitedClass = new HashSet<Class<?>>();
+        visitedClass.add(clazz);
+        return doGenerate(clazz, customFields, "", numberOfItems, visitedClass);
     }
 
-    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems) {
-        return doGenerate(clazz, customFields, attributesPath, numberOfItems);
+    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClass) {
+        return doGenerate(clazz, customFields, attributesPath, numberOfItems, visitedClass);
     }
 
-    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems) {
+    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClass) {
 
         try {
-
             T type;
 
             if (hasNoArgsConstructor(clazz)) {
                 type = clazz.getDeclaredConstructor().newInstance();
             } else {
-                type = getInstanceForConstructorWithLessArguments(clazz, numberOfItems);
+                type = getInstanceForConstructorWithLessArguments(clazz, numberOfItems, visitedClass);
             }
 
             Field[] fields = type.getClass().getDeclaredFields();
             List<Field> fieldsList = ignoreFinalFields(fields);
 
             for (Field field : fieldsList) {
+                //Avoid circular attribute generation
+                if(visitedClass.contains(field.getType())) {
+                    continue;
+                }
+
                 field.setAccessible(true);
 
                 String fieldName = field.getName();
@@ -149,7 +160,7 @@ public class GenericFixture {
                 //Only set field value if not already defined.
                 if (isNull(field.get(type)) || field.getType().isPrimitive()) {
                     Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath, numberOfItems);
+                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath, numberOfItems, visitedClass);
                     field.set(type, result);
                 }
             }
@@ -169,7 +180,7 @@ public class GenericFixture {
                 .collect(Collectors.toList());
     }
 
-    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz, Integer numberOfItems) throws Exception {
+    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz, Integer numberOfItems, Set<Class<?>> visitedClass) throws Exception {
 
         Constructor<?>[] constructors = clazz.getConstructors();
 
@@ -190,7 +201,7 @@ public class GenericFixture {
 
             if (parameterTypes[i].isPrimitive()) {
                 //Generates a value for each primitive argument
-                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "", numberOfItems);
+                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "", numberOfItems, visitedClass);
             } else {
                 arguments[i] = null;
             }
@@ -291,7 +302,8 @@ public class GenericFixture {
                                            Map<AnnotationsEnum, Annotation> hashMap,
                                            Map<String, Object> customFields,
                                            String currentPath,
-                                           Integer numberOfItems) throws Exception {
+                                           Integer numberOfItems,
+                                           Set<Class<?>> visitedClass) throws Exception {
 
         if (fieldType == String.class) {
             String string = RandomStringUtils.randomAlphanumeric(10);
@@ -479,7 +491,7 @@ public class GenericFixture {
 
         //Here we can identify what types are not POJOs
         if (isComplexClass(fieldType)) {
-            return generate(fieldType, customFields, currentPath, numberOfItems);
+            return generate(fieldType, customFields, currentPath, numberOfItems, visitedClass);
         }
 
         if (implementsCollection(fieldType)) {
@@ -514,7 +526,7 @@ public class GenericFixture {
             assert collection != null;
 
             for (int i = 0; i < numberOfItems; i++) {
-                Object obj = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItems);
+                Object obj = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItems, visitedClass);
                 collection.add(obj);
             }
 
@@ -559,8 +571,8 @@ public class GenericFixture {
             assert map != null;
 
             for (int i = 0; i < numberOfItems; i++) {
-                Object key = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItems);
-                Object value = getObjectByClass(innerClasses[1], customFields, currentPath, numberOfItems);
+                Object key = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItems, visitedClass);
+                Object value = getObjectByClass(innerClasses[1], customFields, currentPath, numberOfItems, visitedClass);
                 tryPutOnMap(type, map, key, value);
             }
 
@@ -576,9 +588,9 @@ public class GenericFixture {
                 if (hasTypeParameters(arrayType)) {
                     //This cast is necessary to parse Map<K,V>[] to Map<K,V>, or List<E>[] to List<E>
                     Type genericType = (((GenericArrayType) type).getGenericComponentType());
-                    Array.set(array, i, getRandomForType(arrayType, genericType, hashMap, customFields, currentPath, numberOfItems));
+                    Array.set(array, i, getRandomForType(arrayType, genericType, hashMap, customFields, currentPath, numberOfItems, visitedClass));
                 } else {
-                    Array.set(array, i, getObjectByClass(arrayType, customFields, currentPath, numberOfItems));
+                    Array.set(array, i, getObjectByClass(arrayType, customFields, currentPath, numberOfItems, visitedClass));
                 }
             }
 
@@ -628,10 +640,10 @@ public class GenericFixture {
         return false;
     }
 
-    private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath, Integer numberOfItems) throws Exception {
+    private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath, Integer numberOfItems, Set<Class<?>> visitedClass) throws Exception {
         return isComplexClass(innerClass) ?
-                generate(innerClass, customFields, currentPath, numberOfItems) :
-                getRandomForType(innerClass, null, new HashMap<>(), null, currentPath, numberOfItems);
+                generate(innerClass, customFields, currentPath, numberOfItems, visitedClass) :
+                getRandomForType(innerClass, null, new HashMap<>(), null, currentPath, numberOfItems, visitedClass);
     }
 
     private static boolean isComplexClass(Class<?> clazz) {
