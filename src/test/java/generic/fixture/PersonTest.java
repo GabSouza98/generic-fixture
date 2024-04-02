@@ -3,6 +3,7 @@ package generic.fixture;
 import domain.circular.generation.Person;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class PersonTest {
@@ -20,6 +21,19 @@ public class PersonTest {
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getPetShop());
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getAnimal().getPerson());
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getAnimal(). getPetShop());
+
+    }
+
+    @Test
+    void shouldGenerateClassWithAtributesOfSameClass() {
+
+        var person = GenericFixture.generate(Person.class);
+
+        assertNotNull(person.getBankTwo());
+        assertNotNull(person.getBankOne());
+        assertNotNull(person.getAnimals().get(0).getPetShop().getEmployeed().getBankOne());
+        assertNotNull(person.getAnimals().get(0).getPetShop().getEmployeed().getBankTwo());
+
 
     }
 }

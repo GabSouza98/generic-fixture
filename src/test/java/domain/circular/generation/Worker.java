@@ -25,5 +25,7 @@ public class Worker {
     private PetShop petShop;
     private Person person;
     private Animal animal;
+    private Bank bankOne;
+    private Bank bankTwo;
 
 }
