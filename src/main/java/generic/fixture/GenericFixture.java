@@ -99,30 +99,30 @@ public class GenericFixture {
     static SecureRandom random = new SecureRandom();
 
     public static <T> T generate(Class<T> clazz) {
-        return doGenerate(clazz, new HashMap<>(), "", 1, new HashSet<Class<?>>());
+        return doGenerate(clazz, new HashMap<>(), "", 1, new HashSet<>());
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) {
-        return doGenerate(clazz, customFields, "", 1, new HashSet<Class<?>>());
+        return doGenerate(clazz, customFields, "", 1, new HashSet<>());
     }
 
     public static <T> T generate(Class<T> clazz, Integer numberOfItems) {
-        return doGenerate(clazz, new HashMap<>(), "", numberOfItems, new HashSet<Class<?>>());
+        return doGenerate(clazz, new HashMap<>(), "", numberOfItems, new HashSet<>());
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems) {
-        return doGenerate(clazz, customFields, "", numberOfItems, new HashSet<Class<?>>());
+        return doGenerate(clazz, customFields, "", numberOfItems, new HashSet<>());
     }
 
-    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasseses) {
-        return doGenerate(clazz, customFields, attributesPath, numberOfItems, visitedClasseses);
+    private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
+        return doGenerate(clazz, customFields, attributesPath, numberOfItems, visitedClasses);
     }
 
     private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
 
         try {
 
-            if(isComplexClass(clazz)) {
+            if (isComplexClass(clazz)) {
                 visitedClasses.add(clazz);
             }
 
@@ -138,8 +138,9 @@ public class GenericFixture {
             List<Field> fieldsList = ignoreFinalFields(fields);
 
             for (Field field : fieldsList) {
+
                 //Avoid circular attribute generation
-                if(visitedClasses.contains(field.getType())) {
+                if (visitedClasses.contains(field.getType())) {
                     continue;
                 }
 
@@ -161,6 +162,7 @@ public class GenericFixture {
                     field.set(type, result);
                 }
             }
+
             visitedClasses.remove(clazz); //Able GenericFixture to generate another attributes for this clazz, because the circular generation will not happen.
             return type;
 
@@ -182,14 +184,14 @@ public class GenericFixture {
         Constructor<?>[] constructors = clazz.getConstructors();
 
         //Order constructor array by lesser parameter count
-        Object[] ordenedConstructors = Arrays.stream(constructors)
+        Object[] orderedConstructors = Arrays.stream(constructors)
                 .sorted(Comparator.comparing(Constructor::getParameterCount))
                 .toArray();
 
-        Constructor<?> construtor = (Constructor<?>) ordenedConstructors[0];
+        Constructor<?> constructor = (Constructor<?>) orderedConstructors[0];
 
         //Get array of parameter types of the constructor
-        Class<?>[] parameterTypes = construtor.getParameterTypes();
+        Class<?>[] parameterTypes = constructor.getParameterTypes();
 
         //Array for storing the values for each argument
         Object[] arguments = new Object[parameterTypes.length];
@@ -205,7 +207,7 @@ public class GenericFixture {
 
         }
 
-        return (T) construtor.newInstance(arguments);
+        return (T) constructor.newInstance(arguments);
     }
 
     private static boolean isCustomField(Map<String, Object> customFields, String currentPath) {

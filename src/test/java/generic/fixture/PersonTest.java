@@ -21,7 +21,7 @@ public class PersonTest {
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getPerson());
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getPetShop());
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getAnimal().getPerson());
-        assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getAnimal(). getPetShop());
+        assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getAnimal().getPetShop());
 
     }
 
@@ -48,7 +48,7 @@ public class PersonTest {
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getPerson());
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getPetShop());
         assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getAnimal().getPerson());
-        assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getAnimal(). getPetShop());
+        assertNull(person.getAnimals().get(0).getPetShop().getEmployeed().getAnimal().getPetShop());
 
         assertNull(person.getAnimals().get(1).getPerson());
         assertNull(person.getAnimals().get(1).getPetShop().getAnimals().get(1).getPerson());
@@ -56,7 +56,7 @@ public class PersonTest {
         assertNull(person.getAnimals().get(1).getPetShop().getEmployeed().getPerson());
         assertNull(person.getAnimals().get(1).getPetShop().getEmployeed().getPetShop());
         assertNull(person.getAnimals().get(1).getPetShop().getEmployeed().getAnimal().getPerson());
-        assertNull(person.getAnimals().get(1).getPetShop().getEmployeed().getAnimal(). getPetShop());
+        assertNull(person.getAnimals().get(1).getPetShop().getEmployeed().getAnimal().getPetShop());
 
         assertEquals(2, person.getAnimals().size());
         assertEquals(2, person.getAnimals().get(0).getPetShop().getAnimals().size());
