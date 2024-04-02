@@ -3,7 +3,6 @@ package generic.fixture;
 import domain.ClassWithAllArgumentsConstructor;
 import domain.Dummy;
 import domain.DummyWithArgsContructors;
-import generic.fixture.GenericFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class GenericFixtureInstantiateWithArgumentsTest {
 
-    //TODO: Esse aqui precisa ?
     @Test
     void shouldInstantiateSuccess() {
         assertDoesNotThrow(() -> GenericFixture.generate(Dummy.class));
