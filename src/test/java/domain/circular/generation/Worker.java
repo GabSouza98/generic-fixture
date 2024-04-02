@@ -1,9 +1,6 @@
 package domain.circular.generation;
 
 import domain.DeepestType;
-import domain.circular.generation.Animal;
-import domain.circular.generation.Person;
-import domain.circular.generation.PetShop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
