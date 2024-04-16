@@ -3,92 +3,29 @@ package generic.fixture;
 import com.github.curiousoddman.rgxgen.RgxGen;
 import enums.AnnotationsEnum;
 import exceptions.TypeNotRecognizedException;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Negative;
-import jakarta.validation.constraints.NegativeOrZero;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.time.temporal.Temporal;
-import java.util.AbstractMap;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Deque;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
-import static enums.AnnotationsEnum.DECIMAL_MAX;
-import static enums.AnnotationsEnum.DECIMAL_MIN;
-import static enums.AnnotationsEnum.DIGITS;
-import static enums.AnnotationsEnum.EMAIL;
-import static enums.AnnotationsEnum.FUTURE;
-import static enums.AnnotationsEnum.FUTURE_OR_PRESENT;
-import static enums.AnnotationsEnum.MAX;
-import static enums.AnnotationsEnum.MIN;
-import static enums.AnnotationsEnum.NEGATIVE;
-import static enums.AnnotationsEnum.NEGATIVE_OR_ZERO;
-import static enums.AnnotationsEnum.PAST;
-import static enums.AnnotationsEnum.PAST_OR_PRESENT;
-import static enums.AnnotationsEnum.PATTERN;
-import static enums.AnnotationsEnum.POSITIVE;
-import static enums.AnnotationsEnum.POSITIVE_OR_ZERO;
-import static enums.AnnotationsEnum.SIZE;
+import static enums.AnnotationsEnum.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static utils.UtilsAnnotations.hasAnnotation;
 import static utils.UtilsAnnotations.limitateDefaultMaxValue;
@@ -107,11 +44,19 @@ public class GenericFixture {
     }
 
     public static <T> T generate(Class<T> clazz, Integer numberOfItems) {
-        return doGenerate(clazz, new HashMap<>(), "", numberOfItems, new HashSet<>());
+        return doGenerate(clazz, new HashMap<>(), "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems) {
-        return doGenerate(clazz, customFields, "", numberOfItems, new HashSet<>());
+        return doGenerate(clazz, customFields, "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
+    }
+
+    public static <T> List<T> generateMany(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems, Integer numberOfFixtures) {
+        List<T> list = new ArrayList<>();
+        for (int i = 0; i < numberOfFixtures; i++) {
+            list.add(doGenerate(clazz, customFields, "", ofNullable(numberOfItems).orElse(1), new HashSet<>()));
+        }
+        return list;
     }
 
     private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
