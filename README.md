@@ -84,12 +84,12 @@ This way, the Person instance had the fields below customized:
 
 Needless to say, if the value passed to the key "pet.name" isn't a String, an Exception will be thrown. 
 <br> 
-The Object passed as **value** in the HashMap must be compatible with the expected field type. 
+The Object passed as **value** in the HashMap must be compatible with the expected field type.
 
 ## Lists, Maps and Arrays
 
-It's possible to determine the number of items generated inside Fields that contain objects.
-Currently, this is implemented for all types of Lists, Maps, and Arrays.
+It's possible to determine the number of items generated inside Fields that are Iterables.
+Currently, this is implemented for all types of Collections, Maps, and Arrays.
 Consider the following Library class:
 
 ``` Java
@@ -111,6 +111,15 @@ Generates 3 random Objects for the fields clients, prices and books.
 If the constructor used doesn't inform the numberOfItems parameter, the default value is 1.
 
 Although not widely used, the generation of fields like Map<K,V>[] it's supported.
+
+## Generate Many
+If you want to generate a list of fixtures at once, instead of repeating the generate() method, consider the following:
+``` Java
+List<Dummy> fixtures = GenericFixture.generateMany(Dummy.class, <customFields>, <numberOfItens>, 3);
+```
+This will generate a List with 3 Dummy objects.
+
+Obs: The third parameter is the number of itens inside iterables, the fourth is the number of fixtures to generate.
 
 ## Supported Annotations
 
@@ -143,7 +152,7 @@ This section aims to clarify some of the inner workings of the generate() method
 
 ### Recursion
 The generate() method uses the package fully qualified name initials to distinguish between a Java Class, 
-and a user created Class. In case it's a user class, a recursion step occurs, allowing to generate random 
+and a user created Class. In case it's a user-defined class, a recursion step occurs, allowing to generate random 
 values for that inner class. 
 <br> 
 This is what makes possible to populate the Pet field of the Person class, 
@@ -156,14 +165,18 @@ keeping track of the path taken inside the class. This is used to check if we ha
 the customFields map keys, to set the field with the custom value.
 <br>
 
+### Inheritance
+The list of populated fields is gathered by traversing the class hierarchy until it reaches Object class. For each class
+in the hierarchy, only fields that are non-final and non-static are considered.
+
 ### Constructors with Arguments
 If the no arguments constructor is absent/hidden, then the constructor with the least amount of parameters is used.
 If the argument type is primitive, a random value is generated. If the argument type is an Object, it's instantiated with null. 
 This is the simplest way to generate an instance of a class without noArgsConstructor. The null values will be populated
 after instantiation, when going through the field iteration.
 
-### Interfaces and Abstract Classes
-Since it's possible to define fields with types such as "List" or "Map", without defining which 
+### Collections Framework - Interfaces and Abstract Classes
+Since it's possible to define fields with interface types such as "List" or "Map", without defining which 
 implementation to use, the GenericFixture checks if the field type is an interface or an abstract class. Then, 
 it chooses a default class that implements/extends that type. If the field type is not an interface/abstract class, the 
 implementation provided is respected (i.e., a LinkedList field will be instantiated as a LinkedList).

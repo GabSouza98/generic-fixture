@@ -89,6 +89,7 @@ import static enums.AnnotationsEnum.POSITIVE_OR_ZERO;
 import static enums.AnnotationsEnum.SIZE;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static utils.UtilsAnnotations.hasAnnotation;
 import static utils.UtilsAnnotations.limitateDefaultMaxValue;
@@ -107,11 +108,19 @@ public class GenericFixture {
     }
 
     public static <T> T generate(Class<T> clazz, Integer numberOfItems) {
-        return doGenerate(clazz, new HashMap<>(), "", numberOfItems, new HashSet<>());
+        return doGenerate(clazz, new HashMap<>(), "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
     }
 
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems) {
-        return doGenerate(clazz, customFields, "", numberOfItems, new HashSet<>());
+        return doGenerate(clazz, customFields, "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
+    }
+
+    public static <T> List<T> generateMany(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems, Integer numberOfFixtures) {
+        List<T> list = new ArrayList<>();
+        for (int i = 0; i < numberOfFixtures; i++) {
+            list.add(doGenerate(clazz, customFields, "", ofNullable(numberOfItems).orElse(1), new HashSet<>()));
+        }
+        return list;
     }
 
     private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
@@ -122,20 +131,13 @@ public class GenericFixture {
 
         try {
 
+            T type = instantiateType(clazz);
+
             if (isComplexClass(clazz)) {
                 visitedClasses.add(clazz);
             }
 
-            T type;
-
-            if (hasNoArgsConstructor(clazz)) {
-                type = clazz.getDeclaredConstructor().newInstance();
-            } else {
-                type = getInstanceForConstructorWithLessArguments(clazz, numberOfItems, visitedClasses);
-            }
-
-            Field[] fields = type.getClass().getDeclaredFields();
-            List<Field> fieldsList = ignoreFinalFields(fields);
+            List<Field> fieldsList = getFieldsList(clazz);
 
             for (Field field : fieldsList) {
 
@@ -147,14 +149,15 @@ public class GenericFixture {
                 field.setAccessible(true);
 
                 String fieldName = field.getName();
-
                 String currentPath = handleAttributesPath(fieldName, attributesPath);
 
                 if (nonNull(customFields) && !customFields.isEmpty() && isCustomField(customFields, currentPath)) {
                     field.set(type, customFields.get(currentPath));
                     customFields.remove(currentPath); //This line is optional
+                    visitedClasses.remove(clazz);
                     continue;
                 }
+
                 //Only set field value if not already defined.
                 if (isNull(field.get(type)) || field.getType().isPrimitive()) {
                     Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
@@ -163,7 +166,8 @@ public class GenericFixture {
                 }
             }
 
-            visitedClasses.remove(clazz); //Able GenericFixture to generate another attributes for this clazz, because the circular generation will not happen.
+            //Enable GenericFixture to generate another instance of this clazz, because circular generation will not happen.
+            visitedClasses.remove(clazz);
             return type;
 
         } catch (Exception e) {
@@ -172,14 +176,37 @@ public class GenericFixture {
         }
     }
 
-    private static List<Field> ignoreFinalFields(Field[] fields) {
+    private static <T> List<Field> getFieldsList(Class<T> clazz) {
+        List<Field> fieldsList = new ArrayList<>();
+        Class<? super T> superClass = clazz;
+
+        do {
+            Field[] fields = superClass.getDeclaredFields();
+            fieldsList.addAll(ignoreFinalAndStaticFields(fields));
+            superClass = superClass.getSuperclass();
+        } while (superClass != Object.class);
+
+        return fieldsList;
+    }
+
+    private static <T> T instantiateType(Class<T> clazz) throws Exception {
+        T type;
+        if (hasNoArgsConstructor(clazz)) {
+            type = clazz.getDeclaredConstructor().newInstance();
+        } else {
+            type = getInstanceForConstructorWithLessArguments(clazz);
+        }
+        return type;
+    }
+
+    private static List<Field> ignoreFinalAndStaticFields(Field[] fields) {
         return Arrays.stream(fields)
                 .filter(f -> !Modifier.isFinal(f.getModifiers()))
                 .filter(f -> !Modifier.isStatic(f.getModifiers()))
                 .collect(Collectors.toList());
     }
 
-    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz, Integer numberOfItems, Set<Class<?>> visitedClasses) throws Exception {
+    private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz) throws Exception {
 
         Constructor<?>[] constructors = clazz.getConstructors();
 
@@ -200,7 +227,8 @@ public class GenericFixture {
 
             if (parameterTypes[i].isPrimitive()) {
                 //Generates a value for each primitive argument
-                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(), "", numberOfItems, visitedClasses);
+                arguments[i] = getRandomForType(parameterTypes[i], parameterTypes[i], new HashMap<>(), new HashMap<>(),
+                        "", null, null);
             } else {
                 arguments[i] = null;
             }
