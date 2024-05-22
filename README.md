@@ -175,7 +175,7 @@ If the argument type is primitive, a random value is generated. If the argument 
 This is the simplest way to generate an instance of a class without noArgsConstructor. The null values will be populated
 after instantiation, when going through the field iteration.
 
-### Interfaces and Abstract Classes
+### Collections Framework - Interfaces and Abstract Classes
 Since it's possible to define fields with interface types such as "List" or "Map", without defining which 
 implementation to use, the GenericFixture checks if the field type is an interface or an abstract class. Then, 
 it chooses a default class that implements/extends that type. If the field type is not an interface/abstract class, the 
