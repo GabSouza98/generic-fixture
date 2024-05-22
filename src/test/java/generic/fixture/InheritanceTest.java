@@ -1,5 +1,6 @@
 package generic.fixture;
 
+import domain.inheritance.CompositionWithInheritance;
 import domain.inheritance.SecondChild;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +19,20 @@ public class InheritanceTest {
         assertNotNull(fixture.getFirstChildLocalDateTime());
         assertNotNull(fixture.getSecondChildDouble());
         assertNotNull(fixture.getSecondChildInt());
+    }
+
+    @Test
+    void testCompositionWithInheritance() {
+        CompositionWithInheritance fixture = GenericFixture.generate(CompositionWithInheritance.class);
+        assertNotNull(fixture.getSecondChild().getParentComplexType());
+        assertNotNull(fixture.getSecondChild().getParentLong());
+        assertNotNull(fixture.getSecondChild().getParentString());
+        assertNotNull(fixture.getSecondChild().getFirstChildBoolean());
+        assertNotNull(fixture.getSecondChild().getFirstChildDouble());
+        assertNotNull(fixture.getSecondChild().getFirstChildLocalDateTime());
+        assertNotNull(fixture.getSecondChild().getSecondChildDouble());
+        assertNotNull(fixture.getSecondChild().getSecondChildInt());
+        assertNotNull(fixture.getName());
     }
 
 }
