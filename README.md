@@ -23,7 +23,7 @@ public class Person {
   @Email
   private String email;
   @Positive
-  private Long age;
+  private Integer age;
   private String address;
   private GenderEnum gender;
   private Pet pet;

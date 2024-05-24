@@ -1,8 +1,8 @@
 package utils;
 
 import enums.AnnotationsEnum;
-import jakarta.validation.constraints.Size;
 
+import javax.validation.constraints.Size;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
