@@ -1,8 +1,8 @@
 package domain;
 
 import generic.fixture.GenericFixture;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+
+import javax.validation.constraints.Max;
 
 public class TwoAnnotations {
 

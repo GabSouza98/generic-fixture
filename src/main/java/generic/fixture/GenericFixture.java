@@ -3,24 +3,24 @@ package generic.fixture;
 import com.github.curiousoddman.rgxgen.RgxGen;
 import enums.AnnotationsEnum;
 import exceptions.TypeNotRecognizedException;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Negative;
-import jakarta.validation.constraints.NegativeOrZero;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Negative;
+import javax.validation.constraints.NegativeOrZero;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -96,25 +96,137 @@ import static utils.UtilsAnnotations.limitateDefaultMaxValue;
 import static utils.UtilsBigDecimal.returnValueByPattern;
 import static utils.UtilsDate.returnValueByPatternAndType;
 
-public class GenericFixture {
-    static SecureRandom random = new SecureRandom();
+/**
+ * This class provides static methods that receive the class definition for which the fixture will be generated,
+ * and returns an instance of that class with fields populated with random values or user defined values for
+ * specific fields.
+ * <p>User defined classes are recursively generated until there's only java classes to instantiate.</p>
+ * <p>If the class to instantiate contains a Java Type that the library is not prepared to handle, it will be set to null.</p>
+ */
+public final class GenericFixture {
 
+    private GenericFixture() {}
+
+    private static final SecureRandom random = new SecureRandom();
+
+    /**
+     * Generates an instance of the specified class with all fields populated with random values.
+     *
+     * @param clazz Class to instantiate.
+     * @return Instance of the desired class with all fields randomly populated.
+     */
     public static <T> T generate(Class<T> clazz) {
         return doGenerate(clazz, new HashMap<>(), "", 1, new HashSet<>());
     }
 
+    /**
+     * Generates an instance of the specified class with fields populated with random values or user defined values
+     * for specific fields.
+     *
+     * <pre>{@code
+     *     public class Person {
+     *         private String name;
+     *         private String email;
+     *         private Integer age;
+     *         private Pet pet;
+     *     }
+     *
+     *     public class Pet {
+     *         private String name;
+     *         private String breed;
+     *     }
+     *
+     *     public static void main(String[] args) {
+     *         HashMap<String, Object> customFields = new HashMap<>();
+     *         customFields.put("name", "Fábio Brazza");
+     *         customFields.put("pet.name", "Jack");
+     *         customFields.put("age", null);
+     *
+     *         Person person = GenericFixture.generate(Person.class, customFields);
+     *
+     *         assertTrue(person.getName().equals("Fábio Brazza"));
+     *         assertTrue(person.getPet().getName().equals("Jack"));
+     *         assertNull(person.getAge());
+     *     }
+     * }</pre>
+     *
+     * @param clazz Class to instantiate.
+     * @param customFields Map where the key represents the path to a specific attribute which will
+     *                     be set with the map value.
+     * @return Instance of the desired class with custom fields defined. Fields not present in the map will still be
+     * randomly populated.
+     */
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) {
         return doGenerate(clazz, customFields, "", 1, new HashSet<>());
     }
 
+    /**
+     * Generates an instance of the specified class with fields populated with random values. Iterable fields will
+     * contain the determined number of items.
+     *
+     * <pre>{@code
+     *     public class Library {
+     *         private List<String> clients;
+     *         private Map<String, Integer> prices;
+     *         private Book[] books;
+     *     }
+     *
+     *     public static void main(String[] args) {
+     *         Library lib = GenericFixture.generate(Library.class, 3);
+     *         assertTrue(lib.getClients().size().equals(3));
+     *         assertTrue(lib.getPrices().size().equals(3));
+     *         assertTrue(lib.getBooks().length == 3);
+     *     }
+     * }</pre>
+     *
+     * @param clazz Class to instantiate.
+     * @param numberOfItems Number of itens to be inserted in each Collection or Array field of the class.
+     * @return Instance of the desired class with all fields randomly populated and iterables containing the specified number of items.
+     */
     public static <T> T generate(Class<T> clazz, Integer numberOfItems) {
         return doGenerate(clazz, new HashMap<>(), "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
     }
 
+    /**
+     * Generates an instance of the specified class with fields populated with random values or user defined values
+     * for specific fields. Iterable fields will contain the determined number of items.
+     * Combines the functionality of {@link GenericFixture#generate(Class, Map)} and {@link GenericFixture#generate(Class, Integer)}
+     *
+     * @param clazz Class to instantiate.
+     * @param customFields Map where the key represents the path to a specific attribute which
+     *                     will be set with the map value.
+     * @param numberOfItems Number of itens to be inserted in each Collection or Array field of the class. If null is
+     *                      passed as an argument, the default value is 1.
+     * @return Instance of the desired class with fields randomly populated or with user defined values and iterables.
+     *
+     * containing the specified number of items.
+     */
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems) {
         return doGenerate(clazz, customFields, "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
     }
 
+    /**
+     * Generates a List of instances of the specified class, with fields populated with random values or user defined values
+     * for specific fields. Iterable fields will contain the determined number of items.
+     * This method extends the functionality of {@link GenericFixture#generate(Class, Map, Integer)}.
+     *
+     * <pre>{@code
+     *     public static void main(String[] args) {
+     *         List<Dummy> fixtureList = GenericFixture
+     *             .generateMany(Dummy.class, new HashMap<>(), 1, 3);
+     *         assertTrue(fixtureList.size().equals(3));
+     *     }
+     * }</pre>
+     *
+     * @param clazz Class to instantiate.
+     * @param customFields Map where the key represents the path to a specific attribute which
+     *                     will be set with the map value.
+     * @param numberOfItems Number of itens to be inserted in each Collection or Array field of the class. If null is
+     *                      passed as an argument, the default value is 1.
+     * @param numberOfFixtures Number of fixtures to generate.
+     * @return List of instances of the desired class with fields randomly populated or with user defined values and
+     * iterables containing the specified number of items.
+     */
     public static <T> List<T> generateMany(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems, Integer numberOfFixtures) {
         List<T> list = new ArrayList<>();
         for (int i = 0; i < numberOfFixtures; i++) {
@@ -161,7 +273,8 @@ public class GenericFixture {
                 //Only set field value if not already defined.
                 if (isNull(field.get(type)) || field.getType().isPrimitive()) {
                     Map<AnnotationsEnum, Annotation> map = getAnnotationsMap(field);
-                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields, currentPath, numberOfItems, visitedClasses);
+                    Object result = getRandomForType(field.getType(), field.getGenericType(), map, customFields,
+                            currentPath, numberOfItems, visitedClasses);
                     field.set(type, result);
                 }
             }
@@ -325,7 +438,7 @@ public class GenericFixture {
     }
 
     private static Object getRandomForType(Class<?> fieldType,
-                                           Type type,
+                                           Type genericType,
                                            Map<AnnotationsEnum, Annotation> hashMap,
                                            Map<String, Object> customFields,
                                            String currentPath,
@@ -523,7 +636,7 @@ public class GenericFixture {
 
         if (implementsCollection(fieldType)) {
 
-            Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside List<T>
+            Class<?>[] innerClasses = getInnerClasses(genericType); //Get the Generic type inside List<T>
             Collection<Object> collection = null;
 
             if (fieldType.isInterface()) {
@@ -562,7 +675,7 @@ public class GenericFixture {
 
         if (implementsMap(fieldType) || isDictionary(fieldType)) {
 
-            Class<?>[] innerClasses = getInnerClasses(type); //Get the Generic type inside Map<K, V>
+            Class<?>[] innerClasses = getInnerClasses(genericType); //Get the Generic type inside Map<K, V>
             Map<Object, Object> map = null;
 
             if (fieldType.isInterface() || Modifier.isAbstract(fieldType.getModifiers())) {
@@ -600,7 +713,7 @@ public class GenericFixture {
             for (int i = 0; i < numberOfItems; i++) {
                 Object key = getObjectByClass(innerClasses[0], customFields, currentPath, numberOfItems, visitedClasses);
                 Object value = getObjectByClass(innerClasses[1], customFields, currentPath, numberOfItems, visitedClasses);
-                tryPutOnMap(type, map, key, value);
+                tryPutOnMap(genericType, map, key, value);
             }
 
             return map;
@@ -614,8 +727,8 @@ public class GenericFixture {
             for (int i = 0; i < numberOfItems; i++) {
                 if (hasTypeParameters(arrayType)) {
                     //This cast is necessary to parse Map<K,V>[] to Map<K,V>, or List<E>[] to List<E>
-                    Type genericType = (((GenericArrayType) type).getGenericComponentType());
-                    Array.set(array, i, getRandomForType(arrayType, genericType, hashMap, customFields, currentPath, numberOfItems, visitedClasses));
+                    Type genericComponentType = (((GenericArrayType) genericType).getGenericComponentType());
+                    Array.set(array, i, getRandomForType(arrayType, genericComponentType, hashMap, customFields, currentPath, numberOfItems, visitedClasses));
                 } else {
                     Array.set(array, i, getObjectByClass(arrayType, customFields, currentPath, numberOfItems, visitedClasses));
                 }
@@ -624,7 +737,7 @@ public class GenericFixture {
             return array;
         }
 
-        throw new TypeNotRecognizedException(fieldType.getTypeName());
+        return null;
     }
 
     private static boolean hasTypeParameters(Class<?> clazz) {
@@ -684,7 +797,7 @@ public class GenericFixture {
     private static Class<?>[] getInnerClasses(Type type) throws ClassNotFoundException {
         //If the field has generics, we need to get the generic types
         ParameterizedType parameterizedType = (ParameterizedType) type;
-        //Inner types, like T of List<T> or K, V of Map<K, V>
+        //Generic types, like T of List<T> or K, V of Map<K, V>
         Type[] types = parameterizedType.getActualTypeArguments();
 
         Class<?>[] innerClasses = new Class<?>[types.length];

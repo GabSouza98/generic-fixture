@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -568,9 +569,8 @@ class GenericFixtureTest {
     }
 
     @Test
-    void shouldThrowsExceptionWhenClassIsNotImplementedOnGenericFixture() {
-        var exception = assertThrows(RuntimeException.class, () -> GenericFixture.generate(ClassNotImplemented.class));
-        assertEquals("Type not recognized: java.time.Clock", exception.getMessage());
+    void shouldNotThrowExceptionWhenClassIsNotImplementedOnGenericFixture() {
+        assertDoesNotThrow(() -> GenericFixture.generate(ClassNotImplemented.class));
     }
 
     @Test
