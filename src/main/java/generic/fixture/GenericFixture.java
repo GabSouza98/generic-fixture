@@ -206,6 +206,28 @@ public final class GenericFixture {
     }
 
     /**
+     * Generates a List of instances of the specified class with all fields populated with random values.
+     *
+     * <pre>{@code
+     *     public static void main(String[] args) {
+     *         List<Dummy> fixtureList = GenericFixture.generateMany(Dummy.class, 3);
+     *         assertTrue(fixtureList.size().equals(3));
+     *     }
+     * }</pre>
+     *
+     * @param clazz Class to instantiate.
+     * @param numberOfFixtures Number of fixtures to generate.
+     * @return List of instances of the desired class with fields randomly populated.
+     */
+    public static <T> List<T> generateMany(Class<T> clazz, Integer numberOfFixtures) {
+        List<T> list = new ArrayList<>();
+        for (int i = 0; i < numberOfFixtures; i++) {
+            list.add(doGenerate(clazz, new HashMap<>(), "", 1, new HashSet<>()));
+        }
+        return list;
+    }
+
+    /**
      * Generates a List of instances of the specified class, with fields populated with random values or user defined values
      * for specific fields. Iterable fields will contain the determined number of items.
      * This method extends the functionality of {@link GenericFixture#generate(Class, Map, Integer)}.
