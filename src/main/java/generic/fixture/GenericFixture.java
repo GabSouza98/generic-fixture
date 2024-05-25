@@ -319,7 +319,7 @@ public final class GenericFixture {
             Field[] fields = superClass.getDeclaredFields();
             fieldsList.addAll(ignoreFinalAndStaticFields(fields));
             superClass = superClass.getSuperclass();
-        } while (superClass != Object.class);
+        } while (isComplexClass(superClass));
 
         return fieldsList;
     }

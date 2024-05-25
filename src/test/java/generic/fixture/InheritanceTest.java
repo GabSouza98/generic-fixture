@@ -1,9 +1,13 @@
 package generic.fixture;
 
+import domain.inheritance.ArrayInheritance;
 import domain.inheritance.CompositionWithInheritance;
 import domain.inheritance.SecondChild;
+import domain.inheritance.Withdrawal;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class InheritanceTest {
@@ -33,6 +37,12 @@ public class InheritanceTest {
         assertNotNull(fixture.getSecondChild().getSecondChildDouble());
         assertNotNull(fixture.getSecondChild().getSecondChildInt());
         assertNotNull(fixture.getName());
+    }
+
+    @Test
+    void testArrayInheritance() {
+        Withdrawal withdrawal = assertDoesNotThrow(() -> GenericFixture.generate(Withdrawal.class));
+        assertEquals(0, withdrawal.getArrayInheritance().size());
     }
 
 }
