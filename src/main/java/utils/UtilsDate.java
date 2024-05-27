@@ -59,11 +59,11 @@ public class UtilsDate {
         }
 
         if (time == LocalTime.class) {
-            return LocalTime.now().plusMinutes(1);
+            return LocalTime.now().plusSeconds(1);
         }
 
         if (time == OffsetTime.class) {
-            return OffsetTime.now().plusMinutes(1);
+            return OffsetTime.now().plusSeconds(1);
         }
 
         if (time == Date.class) {
@@ -99,11 +99,11 @@ public class UtilsDate {
         }
 
         if (time == LocalTime.class) {
-            return LocalTime.now().minusHours(1);
+            return LocalTime.now().minusSeconds(1);
         }
 
         if (time == OffsetTime.class) {
-            return OffsetTime.now().minusHours(1);
+            return OffsetTime.now().minusSeconds(1);
         }
 
         if (time == Date.class) {
