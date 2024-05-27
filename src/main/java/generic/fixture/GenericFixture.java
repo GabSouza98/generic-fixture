@@ -287,7 +287,6 @@ public final class GenericFixture {
 
                 if (nonNull(customFields) && !customFields.isEmpty() && isCustomField(customFields, currentPath)) {
                     field.set(type, customFields.get(currentPath));
-                    customFields.remove(currentPath); //This line is optional
                     visitedClasses.remove(clazz);
                     continue;
                 }
@@ -319,7 +318,7 @@ public final class GenericFixture {
             Field[] fields = superClass.getDeclaredFields();
             fieldsList.addAll(ignoreFinalAndStaticFields(fields));
             superClass = superClass.getSuperclass();
-        } while (superClass != Object.class);
+        } while (isComplexClass(superClass));
 
         return fieldsList;
     }
