@@ -267,6 +267,26 @@ public final class GenericFixture {
 
             T type = instantiateType(clazz);
 
+            Type genericSuperClass = clazz.getGenericSuperclass();
+            if (genericSuperClass != null) {
+                if (genericSuperClass instanceof ParameterizedType) {
+                    ParameterizedType superPt = (ParameterizedType) genericSuperClass;
+                    superPt.getActualTypeArguments(); //Thing
+                    superPt.getRawType(); //ArrayList
+
+                    Object result = getRandomForType(clazz.getSuperclass(), genericSuperClass,
+                            new HashMap<>(), new HashMap<>(),
+                            "", numberOfItems, visitedClasses);
+
+                    System.out.println(result);
+
+                    ((ArrayList) type).add( ((ArrayList) result).get(0));
+                    System.out.println(type);
+
+//                    field.set(type, result);
+                }
+            }
+
             if (isComplexClass(clazz)) {
                 visitedClasses.add(clazz);
             }
