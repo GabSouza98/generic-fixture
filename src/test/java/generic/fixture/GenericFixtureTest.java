@@ -1,6 +1,8 @@
 package generic.fixture;
 
 import domain.*;
+import domain.inheritance.ArrayInheritance;
+import domain.inheritance.Withdrawal;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -15,6 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
@@ -580,6 +583,15 @@ class GenericFixtureTest {
         assertEquals(2, classWithOnlyIterables.getSimpleList().size());
         assertEquals(2, classWithOnlyIterables.getSimpleMap().size());
         assertEquals(2, classWithOnlyIterables.getSimpleArray().length);
+    }
+
+    @Test
+    void shouldNotThrowExceptionUsingMapOfCustomFields() {
+        Map<String, Object> customFields = Map.of("with1", "A", "with2", "B");
+        Withdrawal withdrawal = assertDoesNotThrow(() -> GenericFixture.generate(Withdrawal.class, customFields));
+
+        assertEquals("A", withdrawal.getWith1());
+        assertEquals("B", withdrawal.getWith2());
     }
 
 }
