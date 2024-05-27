@@ -40,15 +40,27 @@ public class InheritanceTest {
     }
 
     @Test
-    void testArrayInheritance() {
-        Withdrawal withdrawal = assertDoesNotThrow(() -> GenericFixture.generate(Withdrawal.class));
+    void testWithdrawal() {
+        Withdrawal withdrawal = assertDoesNotThrow(() -> GenericFixture.generate(Withdrawal.class, 1));
         assertEquals(1, withdrawal.getArrayInheritance().size());
     }
 
     @Test
-    void testArrayInheritance2() {
+    void testWithdrawalWith3Items() {
+        Withdrawal withdrawal = assertDoesNotThrow(() -> GenericFixture.generate(Withdrawal.class, 3));
+        assertEquals(3, withdrawal.getArrayInheritance().size());
+    }
+
+    @Test
+    void testArrayInheritance() {
         ArrayInheritance arrayInheritance = assertDoesNotThrow(() -> GenericFixture.generate(ArrayInheritance.class));
         assertEquals(1, arrayInheritance.size());
+    }
+
+    @Test
+    void testArrayInheritanceWith3Items() {
+        ArrayInheritance arrayInheritance = assertDoesNotThrow(() -> GenericFixture.generate(ArrayInheritance.class, 3));
+        assertEquals(3, arrayInheritance.size());
     }
 
 }

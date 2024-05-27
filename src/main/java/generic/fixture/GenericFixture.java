@@ -2,7 +2,6 @@ package generic.fixture;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
 import enums.AnnotationsEnum;
-import exceptions.TypeNotRecognizedException;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.validation.constraints.DecimalMax;
@@ -267,25 +266,7 @@ public final class GenericFixture {
 
             T type = instantiateType(clazz);
 
-            Type genericSuperClass = clazz.getGenericSuperclass();
-            if (genericSuperClass != null) {
-                if (genericSuperClass instanceof ParameterizedType) {
-                    ParameterizedType superPt = (ParameterizedType) genericSuperClass;
-                    superPt.getActualTypeArguments(); //Thing
-                    superPt.getRawType(); //ArrayList
-
-                    Object result = getRandomForType(clazz.getSuperclass(), genericSuperClass,
-                            new HashMap<>(), new HashMap<>(),
-                            "", numberOfItems, visitedClasses);
-
-                    System.out.println(result);
-
-                    ((ArrayList) type).add( ((ArrayList) result).get(0));
-                    System.out.println(type);
-
-//                    field.set(type, result);
-                }
-            }
+            populateIfClassExtendsFromCollectionFramework(type, clazz, numberOfItems);
 
             if (isComplexClass(clazz)) {
                 visitedClasses.add(clazz);
@@ -327,6 +308,35 @@ public final class GenericFixture {
         } catch (Exception e) {
             System.out.println("\nError ocurred ".concat(e.toString()));
             throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private static <T> void populateIfClassExtendsFromCollectionFramework(T type, Class<T> clazz, Integer numberOfItems) throws Exception {
+
+        Type genericSuperClass = clazz.getGenericSuperclass();
+
+        if (genericSuperClass != null) {
+
+            if (genericSuperClass instanceof ParameterizedType) {
+
+                Object result = getRandomForType(clazz.getSuperclass(), genericSuperClass,
+                        new HashMap<>(), new HashMap<>(),
+                        "", numberOfItems, new HashSet<>());
+
+                if (implementsCollection(clazz)) {
+                    Collection collectionResult = (Collection) result;
+                    collectionResult.forEach((item) -> {
+                        ((Collection) type).add(item);
+                    });
+                }
+
+                if (implementsMap(clazz)) {
+                    Map mapResult = (Map) result;
+                    mapResult.forEach((k, v) -> {
+                        ((Map) type).put(k, v);
+                    });
+                }
+            }
         }
     }
 
