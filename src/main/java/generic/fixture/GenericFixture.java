@@ -313,29 +313,28 @@ public final class GenericFixture {
 
     private static <T> void populateIfClassExtendsFromCollectionFramework(T type, Class<T> clazz, Integer numberOfItems) throws Exception {
 
-        Type genericSuperClass = clazz.getGenericSuperclass();
+        Class<? super T> previousClass;
+        Class<? super T> superClass = clazz;
+        do {
+            previousClass = superClass;
+            superClass = previousClass.getSuperclass();
+        } while (isComplexClass(superClass));
 
-        if (genericSuperClass != null) {
+        Type genericSuperClass = previousClass.getGenericSuperclass();
 
-            if (genericSuperClass instanceof ParameterizedType) {
+        if (genericSuperClass instanceof ParameterizedType) {
 
-                Object result = getRandomForType(clazz.getSuperclass(), genericSuperClass,
-                        new HashMap<>(), new HashMap<>(),
-                        "", numberOfItems, new HashSet<>());
+            Object result = getRandomForType(previousClass.getSuperclass(), genericSuperClass,
+                    new HashMap<>(), new HashMap<>(), "", numberOfItems, new HashSet<>());
 
-                if (implementsCollection(clazz)) {
-                    Collection collectionResult = (Collection) result;
-                    collectionResult.forEach((item) -> {
-                        ((Collection) type).add(item);
-                    });
-                }
+            if (implementsCollection(clazz)) {
+                Collection collectionResult = (Collection) result;
+                collectionResult.forEach((item) -> ((Collection) type).add(item));
+            }
 
-                if (implementsMap(clazz)) {
-                    Map mapResult = (Map) result;
-                    mapResult.forEach((k, v) -> {
-                        ((Map) type).put(k, v);
-                    });
-                }
+            if (implementsMap(clazz)) {
+                Map mapResult = (Map) result;
+                mapResult.forEach((k, v) -> ((Map) type).put(k, v));
             }
         }
     }
@@ -490,7 +489,7 @@ public final class GenericFixture {
 
     private static Object getRandomForType(Class<?> fieldType,
                                            Type genericType,
-                                           Map<AnnotationsEnum, Annotation> hashMap,
+                                           Map<AnnotationsEnum, Annotation> annotationsMap,
                                            Map<String, Object> customFields,
                                            String currentPath,
                                            Integer numberOfItems,
@@ -499,85 +498,85 @@ public final class GenericFixture {
         if (fieldType == String.class) {
             String string = RandomStringUtils.randomAlphanumeric(10);
 
-            if (hashMap.containsKey(PATTERN)) {
-                Pattern pattern = (Pattern) hashMap.get(PATTERN);
+            if (annotationsMap.containsKey(PATTERN)) {
+                Pattern pattern = (Pattern) annotationsMap.get(PATTERN);
                 string = new RgxGen(pattern.regexp()).generate();
             }
 
-            if (hashMap.containsKey(SIZE)) {
-                Size size = (Size) hashMap.get(SIZE);
+            if (annotationsMap.containsKey(SIZE)) {
+                Size size = (Size) annotationsMap.get(SIZE);
                 int max = limitateDefaultMaxValue(size);
                 string = RandomStringUtils.randomAlphanumeric(size.min(), max);
             }
 
-            if (hashMap.containsKey(PAST)
-                    || hashMap.containsKey(PAST_OR_PRESENT)
-                    || hashMap.containsKey(FUTURE)
-                    || hashMap.containsKey(FUTURE_OR_PRESENT)) {
-                string = returnValueByPatternAndType(hashMap, LocalDateTime.class).toString();
+            if (annotationsMap.containsKey(PAST)
+                    || annotationsMap.containsKey(PAST_OR_PRESENT)
+                    || annotationsMap.containsKey(FUTURE)
+                    || annotationsMap.containsKey(FUTURE_OR_PRESENT)) {
+                string = returnValueByPatternAndType(annotationsMap, LocalDateTime.class).toString();
             }
 
-            if (hashMap.containsKey(EMAIL)) {
+            if (annotationsMap.containsKey(EMAIL)) {
                 string = new RgxGen("^[a-zA-Z0-9_.]{1,10}@email\\.com$").generate();
             }
 
-            if (hashMap.containsKey(POSITIVE)
-                || hashMap.containsKey(POSITIVE_OR_ZERO)
-                || hashMap.containsKey(NEGATIVE)
-                || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                || hashMap.containsKey(DECIMAL_MIN)
-                || hashMap.containsKey(DECIMAL_MAX)
-                || hashMap.containsKey(DIGITS)
-                || hashMap.containsKey(MIN)
-                || hashMap.containsKey(MAX)) {
-                string = returnValueByPattern(hashMap).toString();
+            if (annotationsMap.containsKey(POSITIVE)
+                || annotationsMap.containsKey(POSITIVE_OR_ZERO)
+                || annotationsMap.containsKey(NEGATIVE)
+                || annotationsMap.containsKey(NEGATIVE_OR_ZERO)
+                || annotationsMap.containsKey(DECIMAL_MIN)
+                || annotationsMap.containsKey(DECIMAL_MAX)
+                || annotationsMap.containsKey(DIGITS)
+                || annotationsMap.containsKey(MIN)
+                || annotationsMap.containsKey(MAX)) {
+                string = returnValueByPattern(annotationsMap).toString();
             }
 
             return string;
         }
 
         if (fieldType == Long.class || fieldType == long.class) {
-            if (hashMap.containsKey(DIGITS)
-                || hashMap.containsKey(POSITIVE)
-                || hashMap.containsKey(POSITIVE_OR_ZERO)
-                || hashMap.containsKey(NEGATIVE)
-                || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                || hashMap.containsKey(DECIMAL_MAX)
-                || hashMap.containsKey(MIN)
-                || hashMap.containsKey(MAX)) {
+            if (annotationsMap.containsKey(DIGITS)
+                || annotationsMap.containsKey(POSITIVE)
+                || annotationsMap.containsKey(POSITIVE_OR_ZERO)
+                || annotationsMap.containsKey(NEGATIVE)
+                || annotationsMap.containsKey(NEGATIVE_OR_ZERO)
+                || annotationsMap.containsKey(DECIMAL_MAX)
+                || annotationsMap.containsKey(MIN)
+                || annotationsMap.containsKey(MAX)) {
                 //The transformation to long discards decimal places
-                return returnValueByPattern(hashMap).longValue();
+                return returnValueByPattern(annotationsMap).longValue();
             }
 
             return random.nextLong();
         }
 
         if (fieldType == Integer.class || fieldType == int.class) {
-            if (hashMap.containsKey(DIGITS)
-                || hashMap.containsKey(POSITIVE)
-                || hashMap.containsKey(POSITIVE_OR_ZERO)
-                || hashMap.containsKey(NEGATIVE)
-                || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                || hashMap.containsKey(DECIMAL_MAX)
-                || hashMap.containsKey(MIN)
-                || hashMap.containsKey(MAX)) {
-                return returnValueByPattern(hashMap).intValue();
+            if (annotationsMap.containsKey(DIGITS)
+                || annotationsMap.containsKey(POSITIVE)
+                || annotationsMap.containsKey(POSITIVE_OR_ZERO)
+                || annotationsMap.containsKey(NEGATIVE)
+                || annotationsMap.containsKey(NEGATIVE_OR_ZERO)
+                || annotationsMap.containsKey(DECIMAL_MAX)
+                || annotationsMap.containsKey(MIN)
+                || annotationsMap.containsKey(MAX)) {
+                return returnValueByPattern(annotationsMap).intValue();
             }
 
             return random.nextInt(100000);
         }
 
         if (fieldType == Double.class || fieldType == double.class) {
-            if (hashMap.containsKey(DIGITS)
-                || hashMap.containsKey(POSITIVE)
-                || hashMap.containsKey(POSITIVE_OR_ZERO)
-                || hashMap.containsKey(NEGATIVE)
-                || hashMap.containsKey(NEGATIVE_OR_ZERO)
-                || hashMap.containsKey(DECIMAL_MIN)
-                || hashMap.containsKey(DECIMAL_MAX)
-                || hashMap.containsKey(MIN)
-                || hashMap.containsKey(MAX)) {
-                return returnValueByPattern(hashMap).doubleValue();
+            if (annotationsMap.containsKey(DIGITS)
+                || annotationsMap.containsKey(POSITIVE)
+                || annotationsMap.containsKey(POSITIVE_OR_ZERO)
+                || annotationsMap.containsKey(NEGATIVE)
+                || annotationsMap.containsKey(NEGATIVE_OR_ZERO)
+                || annotationsMap.containsKey(DECIMAL_MIN)
+                || annotationsMap.containsKey(DECIMAL_MAX)
+                || annotationsMap.containsKey(MIN)
+                || annotationsMap.containsKey(MAX)) {
+                return returnValueByPattern(annotationsMap).doubleValue();
             }
 
             return random.nextDouble();
@@ -592,15 +591,15 @@ public final class GenericFixture {
         }
 
         if (fieldType == BigDecimal.class) {
-            if (hasAnnotation(hashMap)) {
-               return returnValueByPattern(hashMap);
+            if (hasAnnotation(annotationsMap)) {
+               return returnValueByPattern(annotationsMap);
             }
             return BigDecimal.valueOf(random.nextDouble());
         }
 
         if (fieldType == Date.class ) {
-            if(hasAnnotation(hashMap)) {
-                return returnValueByPatternAndType(hashMap, Date.class);
+            if(hasAnnotation(annotationsMap)) {
+                return returnValueByPatternAndType(annotationsMap, Date.class);
             }
             return new Date();
         }
@@ -621,50 +620,50 @@ public final class GenericFixture {
             } else {
 
                 if (fieldType == LocalDateTime.class) {
-                    if(hasAnnotation(hashMap)) {
-                        return returnValueByPatternAndType(hashMap, LocalDateTime.class);
+                    if(hasAnnotation(annotationsMap)) {
+                        return returnValueByPatternAndType(annotationsMap, LocalDateTime.class);
                     }
                     return LocalDateTime.now();
                 }
 
                 if (fieldType == OffsetDateTime.class) {
-                    if(hasAnnotation(hashMap)) {
-                        return returnValueByPatternAndType(hashMap, OffsetDateTime.class);
+                    if(hasAnnotation(annotationsMap)) {
+                        return returnValueByPatternAndType(annotationsMap, OffsetDateTime.class);
                     }
                     return OffsetDateTime.now();
                 }
 
                 if (fieldType == Instant.class) {
-                    if(hasAnnotation(hashMap)) {
-                        return returnValueByPatternAndType(hashMap, Instant.class);
+                    if(hasAnnotation(annotationsMap)) {
+                        return returnValueByPatternAndType(annotationsMap, Instant.class);
                     }
                     return Instant.now();
                 }
 
                 if (fieldType == ZonedDateTime.class) {
-                    if(hasAnnotation(hashMap)) {
-                        return returnValueByPatternAndType(hashMap, ZonedDateTime.class);
+                    if(hasAnnotation(annotationsMap)) {
+                        return returnValueByPatternAndType(annotationsMap, ZonedDateTime.class);
                     }
                     return ZonedDateTime.now();
                 }
 
                 if (fieldType == LocalDate.class) {
-                    if(hasAnnotation(hashMap)) {
-                        return returnValueByPatternAndType(hashMap, LocalDate.class);
+                    if(hasAnnotation(annotationsMap)) {
+                        return returnValueByPatternAndType(annotationsMap, LocalDate.class);
                     }
                     return LocalDate.now();
                 }
 
                 if (fieldType == LocalTime.class) {
-                    if(hasAnnotation(hashMap)) {
-                        return returnValueByPatternAndType(hashMap, LocalTime.class);
+                    if(hasAnnotation(annotationsMap)) {
+                        return returnValueByPatternAndType(annotationsMap, LocalTime.class);
                     }
                     return LocalTime.now();
                 }
 
                 if (fieldType == OffsetTime.class) {
-                    if(hasAnnotation(hashMap)) {
-                        return returnValueByPatternAndType(hashMap, OffsetTime.class);
+                    if(hasAnnotation(annotationsMap)) {
+                        return returnValueByPatternAndType(annotationsMap, OffsetTime.class);
                     }
                     return OffsetTime.now();
                 }
@@ -779,7 +778,7 @@ public final class GenericFixture {
                 if (hasTypeParameters(arrayType)) {
                     //This cast is necessary to parse Map<K,V>[] to Map<K,V>, or List<E>[] to List<E>
                     Type genericComponentType = (((GenericArrayType) genericType).getGenericComponentType());
-                    Array.set(array, i, getRandomForType(arrayType, genericComponentType, hashMap, customFields, currentPath, numberOfItems, visitedClasses));
+                    Array.set(array, i, getRandomForType(arrayType, genericComponentType, annotationsMap, customFields, currentPath, numberOfItems, visitedClasses));
                 } else {
                     Array.set(array, i, getObjectByClass(arrayType, customFields, currentPath, numberOfItems, visitedClasses));
                 }

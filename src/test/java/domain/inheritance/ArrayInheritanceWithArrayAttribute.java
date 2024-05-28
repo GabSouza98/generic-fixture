@@ -9,6 +9,7 @@ import java.util.ArrayList;
 @Getter
 @Setter
 @ToString
-public class ArrayInheritance extends ArrayList<Thing> {
-    private String attribute1;
+public class ArrayInheritanceWithArrayAttribute extends ArrayList<Thing> {
+    private ArrayList<Thing> arrayList;
+    private ArrayChild arrayChild;
 }
