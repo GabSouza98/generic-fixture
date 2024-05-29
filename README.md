@@ -147,7 +147,7 @@ public static void main(String[] args) {
 ```
 Since B is-a ArrayList, B will be instantiated containing 5 'A' instances. 
 
-Note: the constructor that takes Map<String, Object> is useful only for defining field values. In this example, the Map
+**Note:** the constructor that takes Map<String, Object> is useful only for defining field values. In this example, the Map
 can be used to set the value for fieldB, since it's a field of B. 
 But the fields for the generic type E of ArrayList<E> will always be random. In the example above, it's impossible to define 
 the value of fieldA.
