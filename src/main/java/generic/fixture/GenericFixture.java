@@ -2,6 +2,8 @@ package generic.fixture;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
 import enums.AnnotationsEnum;
+import exceptions.NoSuitableConstructorException;
+import exceptions.UninstantiableException;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import javax.validation.constraints.DecimalMax;
@@ -25,6 +27,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -86,6 +89,8 @@ import static enums.AnnotationsEnum.PATTERN;
 import static enums.AnnotationsEnum.POSITIVE;
 import static enums.AnnotationsEnum.POSITIVE_OR_ZERO;
 import static enums.AnnotationsEnum.SIZE;
+import static java.lang.reflect.Modifier.isAbstract;
+import static java.lang.reflect.Modifier.isInterface;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -262,6 +267,8 @@ public final class GenericFixture {
 
     private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
 
+        checkIfInstantiationAllowed(clazz);
+
         try {
 
             T type = instantiateType(clazz);
@@ -305,13 +312,24 @@ public final class GenericFixture {
             visitedClasses.remove(clazz);
             return type;
 
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             System.out.println("\nError ocurred ".concat(e.toString()));
             throw new RuntimeException(e.getMessage());
         }
     }
 
+    private static <T> void checkIfInstantiationAllowed(Class<T> clazz) {
+        int clazzModifiers = clazz.getModifiers();
+        if (isAbstract(clazzModifiers) || isInterface(clazzModifiers)) {
+            throw new UninstantiableException();
+        }
+    }
+
     private static <T> void populateIfClassExtendsFromCollectionFramework(T type, Class<T> clazz, Integer numberOfItems) throws Exception {
+
+        if (!(implementsCollection(clazz) || implementsMap(clazz))) return;
 
         Class<? super T> previousClass;
         Class<? super T> superClass = clazz;
@@ -355,7 +373,9 @@ public final class GenericFixture {
     private static <T> T instantiateType(Class<T> clazz) throws Exception {
         T type;
         if (hasNoArgsConstructor(clazz)) {
-            type = clazz.getDeclaredConstructor().newInstance();
+            Constructor<T> cons = clazz.getDeclaredConstructor();
+            cons.setAccessible(true); //In case it's a package-access constructor
+            type = cons.newInstance();
         } else {
             type = getInstanceForConstructorWithLessArguments(clazz);
         }
@@ -369,9 +389,18 @@ public final class GenericFixture {
                 .collect(Collectors.toList());
     }
 
+    private static Constructor<?>[] ignorePrivateAndProtectedConstructors(Constructor<?>[] constructors) {
+        return Arrays.stream(constructors)
+                .filter(f -> !Modifier.isPrivate(f.getModifiers()))
+                .filter(f -> !Modifier.isProtected(f.getModifiers()))
+                .collect(Collectors.toList()).toArray(constructors);
+    }
+
     private static <T> T getInstanceForConstructorWithLessArguments(Class<?> clazz) throws Exception {
 
-        Constructor<?>[] constructors = clazz.getConstructors();
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+
+        constructors = ignorePrivateAndProtectedConstructors(constructors);
 
         //Order constructor array by lesser parameter count
         Object[] orderedConstructors = Arrays.stream(constructors)
@@ -728,7 +757,7 @@ public final class GenericFixture {
             Class<?>[] innerClasses = getInnerClasses(genericType); //Get the Generic type inside Map<K, V>
             Map<Object, Object> map = null;
 
-            if (fieldType.isInterface() || Modifier.isAbstract(fieldType.getModifiers())) {
+            if (fieldType.isInterface() || isAbstract(fieldType.getModifiers())) {
 
                 //Verify all possible Interfaces/AbstractClasses that extends Map
                 //and choose default implementation
@@ -820,14 +849,24 @@ public final class GenericFixture {
         return fieldType == Dictionary.class;
     }
 
-    private static boolean hasNoArgsConstructor(Class<?> clazz) {
-        Constructor<?>[] constructors = clazz.getConstructors();
+    private static <T> boolean hasNoArgsConstructor(Class<T> clazz) {
+
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        constructors = ignorePrivateAndProtectedConstructors(constructors);
+
+        validateConstructors(constructors);
+
         for (Constructor<?> c : constructors) {
             if (c.getParameterCount() == 0) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static void validateConstructors(Constructor<?>[] constructors) {
+        if (constructors.length == 0) throw new NoSuitableConstructorException();
+        if (constructors.length == 1 && isNull(constructors[0])) throw new NoSuitableConstructorException();
     }
 
     private static Object getObjectByClass(Class<?> innerClass, Map<String, Object> customFields, String currentPath, Integer numberOfItems, Set<Class<?>> visitedClasses) throws Exception {

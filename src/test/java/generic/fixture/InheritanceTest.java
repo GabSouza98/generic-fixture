@@ -11,6 +11,9 @@ import domain.inheritance.SetInheritance;
 import domain.inheritance.Withdrawal;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,8 +63,11 @@ public class InheritanceTest {
 
     @Test
     void testArrayInheritance() {
-        ArrayInheritance arrayInheritance = assertDoesNotThrow(() -> GenericFixture.generate(ArrayInheritance.class));
+        Map<String, Object> map = new HashMap<>();
+        map.put("attribute1", "OK");
+        ArrayInheritance arrayInheritance = assertDoesNotThrow(() -> GenericFixture.generate(ArrayInheritance.class, map));
         assertEquals(1, arrayInheritance.size());
+        assertEquals("OK", arrayInheritance.getAttribute1());
         assertNotNull(arrayInheritance.getAttribute1());
     }
 
