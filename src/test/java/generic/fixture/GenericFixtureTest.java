@@ -566,6 +566,13 @@ class GenericFixtureTest {
     }
 
     @Test
+    void shouldGenerateWithArrayAttributesTestSize() {
+        var domainArray = GenericFixture.generate(DomainArray.class, 3);
+        assertEquals(3, domainArray.getArrayMapIntegerInteger().length);
+        assertEquals(3, domainArray.getArrayMapIntegerInteger()[2].size());
+    }
+
+    @Test
     void shouldNotGenerateWhenKeyOfMapIsClassNotImplementsComparable() {
         var exception = assertThrows(RuntimeException.class, () -> GenericFixture.generate(DomainMapError.class));
         assertEquals("It's necessary to implement Comparable<?> Interface in Key Class of the Map: java.util.TreeMap<domain.ComplexType, java.lang.Integer>", exception.getMessage());

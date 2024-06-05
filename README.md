@@ -53,6 +53,23 @@ The console will display something similar:
 Person(name=fkosbOWEFF, email=YMZ@email.com, age=5, address=gBpTpqg57w, gender=MAN, pet=Pet(name=3hGEoV7U6G, breed=Kl1zaV49U8))
 ```
 
+Inheritance is also supported, so all the fields in the hierarchy will be populated. Consider the following:
+``` Java
+class A {
+    private String fieldA;
+}
+
+class B extends A {
+    private String fieldB;
+}
+
+public static void main(String[] args) {
+    B b = GenericFixture.generate(B.class);
+    assertNotNull(b.getFieldA());        
+    assertNotNull(b.getFieldB());        
+}
+```
+
 ## Customized Data Generation
 
 It's possible to customize any field during generation.
@@ -107,10 +124,36 @@ Library myLibrary = GenericFixture.generate(Library.class, 3);
 //or
 Library myLibraryWithCustomFields = GenericFixture.generate(Library.class, <customFieldsMap>, 3);
 ```
-Generates 3 random Objects for the fields clients, prices and books. 
+Generates 3 random items for each of the fields clients, prices and books. 
 If the constructor used doesn't inform the numberOfItems parameter, the default value is 1.
 
-Although not widely used, the generation of fields like Map<K,V>[] it's supported.
+The generate method also populates classes that extend from Collection Framework classes,
+even though they don't have fields of their own. Consider the following class:
+``` Java
+class A {
+    private String fieldA;
+}
+
+class B extends ArrayList<A> {
+    private String fieldB;
+}
+
+public static void main(String[] args) {
+    B b = GenericFixture.generate(B.class, 5);
+    assertTrue(b.size().equals(5));
+    assertNotNull(b.getFieldB());            
+    assertNotNull(b.get(0).getFieldA());
+}
+```
+Since B is-a ArrayList, B will be instantiated containing 5 'A' instances. 
+
+**Note:** the constructor that takes Map<String, Object> is useful only for defining field values. In this example, the Map
+can be used to set the value for fieldB, since it's a field of B. 
+But the fields for the generic type E of ArrayList<E> will always be random. In the example above, it's impossible to define 
+the value of fieldA.
+
+Although not widely used, the generation of fields like Map<K,V>[] it's supported. In this case, if the value representing
+"numberOfItems" is 2, it means that the array will contain 2 Map<K,V> elements, which in turn will also contain 2 entries each.
 
 ## Generate Many
 If you want to generate a list of fixtures at once, instead of repeating the generate() method, consider the following:
@@ -166,7 +209,7 @@ the customFields map keys, to set the field with the custom value.
 <br>
 
 ### Inheritance
-The list of populated fields is gathered by traversing the class hierarchy until it reaches Object class. For each class
+The list of populated fields is gathered by traversing the class hierarchy until it reaches a non user-defined class. For each class
 in the hierarchy, only fields that are non-final and non-static are considered.
 
 ### Constructors with Arguments
