@@ -94,7 +94,7 @@
 
     <groupId>io.github.gabsouza98</groupId>
     <artifactId>generic-fixture</artifactId>
-    <version>1.0.12</version>
+    <version>1.0.13</version>
     <packaging>jar</packaging>
 
     <properties>
