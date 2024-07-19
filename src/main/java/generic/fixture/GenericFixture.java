@@ -120,7 +120,7 @@ public final class GenericFixture {
      * @return Instance of the desired class with all fields randomly populated.
      */
     public static <T> T generate(Class<T> clazz) {
-        return doGenerate(clazz, new HashMap<>(), "", 1, new HashSet<>());
+        return doGenerate(clazz, new HashMap<>(), new HashMap<>(), "", 1, new HashSet<>());
     }
 
     /**
@@ -161,7 +161,15 @@ public final class GenericFixture {
      * randomly populated.
      */
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields) {
-        return doGenerate(clazz, customFields, "", 1, new HashSet<>());
+        return doGenerate(clazz, customFields, new HashMap<>(), "", 1, new HashSet<>());
+    }
+
+    public static <T> T generateWithCustomClass(Class<T> clazz, Map<Class<?>, Object> customClass) {
+        return doGenerate(clazz, new HashMap<>(), customClass, "", 1, new HashSet<>());
+    }
+
+    public static <T> T generateWithCustomClass(Class<T> clazz, CustomMap customClass) {
+        return doGenerate(clazz, new HashMap<>(), customClass.getMap(), "", 1, new HashSet<>());
     }
 
     /**
@@ -188,7 +196,7 @@ public final class GenericFixture {
      * @return Instance of the desired class with all fields randomly populated and iterables containing the specified number of items.
      */
     public static <T> T generate(Class<T> clazz, Integer numberOfItems) {
-        return doGenerate(clazz, new HashMap<>(), "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
+        return doGenerate(clazz, new HashMap<>(), new HashMap<>(), "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
     }
 
     /**
@@ -206,7 +214,7 @@ public final class GenericFixture {
      * containing the specified number of items.
      */
     public static <T> T generate(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems) {
-        return doGenerate(clazz, customFields, "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
+        return doGenerate(clazz, customFields, new HashMap<>(), "", ofNullable(numberOfItems).orElse(1), new HashSet<>());
     }
 
     /**
@@ -226,7 +234,7 @@ public final class GenericFixture {
     public static <T> List<T> generateMany(Class<T> clazz, Integer numberOfFixtures) {
         List<T> list = new ArrayList<>();
         for (int i = 0; i < numberOfFixtures; i++) {
-            list.add(doGenerate(clazz, new HashMap<>(), "", 1, new HashSet<>()));
+            list.add(doGenerate(clazz, new HashMap<>(), new HashMap<>(), "", 1, new HashSet<>()));
         }
         return list;
     }
@@ -256,16 +264,17 @@ public final class GenericFixture {
     public static <T> List<T> generateMany(Class<T> clazz, Map<String, Object> customFields, Integer numberOfItems, Integer numberOfFixtures) {
         List<T> list = new ArrayList<>();
         for (int i = 0; i < numberOfFixtures; i++) {
-            list.add(doGenerate(clazz, customFields, "", ofNullable(numberOfItems).orElse(1), new HashSet<>()));
+            list.add(doGenerate(clazz, customFields, new HashMap<>(), "", ofNullable(numberOfItems).orElse(1), new HashSet<>()));
         }
         return list;
+
     }
 
     private static <T> T generate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
-        return doGenerate(clazz, customFields, attributesPath, numberOfItems, visitedClasses);
+        return doGenerate(clazz, customFields, new HashMap<>(), attributesPath, numberOfItems, visitedClasses);
     }
 
-    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
+    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, Map<Class<?>, Object> customClass, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
 
         checkIfInstantiationAllowed(clazz);
 
@@ -295,6 +304,12 @@ public final class GenericFixture {
 
                 if (nonNull(customFields) && !customFields.isEmpty() && isCustomField(customFields, currentPath)) {
                     field.set(type, customFields.get(currentPath));
+                    visitedClasses.remove(clazz);
+                    continue;
+                }
+
+                if (nonNull(customClass) && !customClass.isEmpty() && isCustomClass(customClass, field.getType())) {
+                    field.set(type, customClass.get(field.getType()));
                     visitedClasses.remove(clazz);
                     continue;
                 }
@@ -434,6 +449,11 @@ public final class GenericFixture {
     private static boolean isCustomField(Map<String, Object> customFields, String currentPath) {
         //If customFields contains "A.B.C" and currentPath is exactly "A.B.C"
         return customFields.keySet().stream().anyMatch(f -> f.equals(currentPath));
+    }
+
+    private static boolean isCustomClass(Map<Class<?>, Object> customClass, Class<?> currentField) {
+        //If customClass contains Class entry for currentField
+        return customClass.keySet().stream().anyMatch(f -> f.equals(currentField));
     }
 
     private static String handleAttributesPath(String fieldName, String attributesPath) {
