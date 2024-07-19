@@ -111,6 +111,42 @@ public final class GenericFixture {
 
     private GenericFixture() {}
 
+    public static class GenericFixtureHelper<T> {
+        private Class<T> clazz;
+        private Map<String, Object> customFields = new HashMap<>();
+        private Map<Class<?>, Object> customClass = new HashMap<>();
+        private Integer numberOfItems = 1;
+        private Integer numberOfFixtures = 1;
+        private Set<Class<?>> visitedClasses = new HashSet<>();
+
+        private GenericFixtureHelper() {}
+
+        public GenericFixtureHelper<T> withCustomFields(Map<String, Object> customFields) {
+            this.customFields = customFields;
+            return this;
+        }
+
+        public GenericFixtureHelper<T> withCustomClass(Map<Class<?>, Object> customClass) {
+            this.customClass = customClass;
+            return this;
+        }
+
+        public GenericFixtureHelper<T> withNumberOfItems(Integer numberOfItems) {
+            this.numberOfItems = numberOfItems;
+            return this;
+        }
+
+        public T generate() {
+            return doGenerate(clazz, customFields, customClass, "", numberOfItems, visitedClasses);
+        }
+    }
+
+    public static <T> GenericFixtureHelper<T> forClass(Class<T> clazz) {
+        GenericFixtureHelper<T> genericFixtureHelper = new GenericFixtureHelper<>();
+        genericFixtureHelper.clazz = clazz;
+        return genericFixtureHelper;
+    }
+
     private static final SecureRandom random = new SecureRandom();
 
     /**
@@ -274,7 +310,8 @@ public final class GenericFixture {
         return doGenerate(clazz, customFields, new HashMap<>(), attributesPath, numberOfItems, visitedClasses);
     }
 
-    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, Map<Class<?>, Object> customClass, String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
+    private static <T> T doGenerate(Class<T> clazz, Map<String, Object> customFields, Map<Class<?>, Object> customClass,
+                                    String attributesPath, Integer numberOfItems, Set<Class<?>> visitedClasses) {
 
         checkIfInstantiationAllowed(clazz);
 
