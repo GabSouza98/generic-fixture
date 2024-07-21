@@ -408,6 +408,7 @@ public final class GenericFixture {
                 .toArray();
 
         Constructor<?> constructor = (Constructor<?>) orderedConstructors[0];
+        constructor.setAccessible(true); //In case it's a package-access constructor
 
         //Get array of parameter types of the constructor
         Class<?>[] parameterTypes = constructor.getParameterTypes();
