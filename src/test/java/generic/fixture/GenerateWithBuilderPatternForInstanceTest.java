@@ -1,15 +1,18 @@
 package generic.fixture;
 
 import domain.constructors.ComplexBusinessLogicConstructor;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class GenerateWithBuilderPatternForInstanceTest {
 
     @Test
     void testWithoutGenericFixture() {
         ComplexBusinessLogicConstructor myInstance = new ComplexBusinessLogicConstructor("1", "2", 3, 4);
-        Assertions.assertNull(myInstance.getAtt5());
+        assertNull(myInstance.getAtt5());
     }
 
     @Test
@@ -17,6 +20,8 @@ public class GenerateWithBuilderPatternForInstanceTest {
         ComplexBusinessLogicConstructor myInstance = new ComplexBusinessLogicConstructor("1", "2", 3, 4);
         ComplexBusinessLogicConstructor myInstance2 = GenericFixture.forInstance(myInstance).generate();
 
-        Assertions.assertNotNull(myInstance.getAtt5());
+        assertNotNull(myInstance.getAtt5());
+        assertNotNull(myInstance2.getAtt5());
+        assertSame(myInstance, myInstance2);
     }
 }
