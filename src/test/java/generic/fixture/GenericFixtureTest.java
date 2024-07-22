@@ -76,7 +76,6 @@ class GenericFixtureTest {
         assertNotNull(dummy.getChronoLocalDateTime(), "Error to insert in ChronoLocalDateTime");
         assertNotNull(dummy.getChronoZonedDateTime(), "Error to insert in ChronoZonedDateTime");
         assertEquals(1, dummy.getStringMap().size(), "Error to insert in String map");
-
     }
 
     @Test
@@ -183,8 +182,8 @@ class GenericFixtureTest {
         assertTrue(dummy.getMaxDouble() <= 10);
         assertTrue(dummy.getMaxBigDecimal().longValue() <= 10);
         assertTrue(Long.parseLong(dummy.getMaxString()) <= 10);
-
     }
+
     @Test
     void shouldIgnore_String_Field() {
         customFields.put("String", null);
@@ -491,7 +490,6 @@ class GenericFixtureTest {
 
     @Test
     void shouldCreateInstanceWithoutNoArgsConstructorAndCustomValues() {
-
         customFields.put("name", NAME);
         customFields.put("anyLong", null);
 
@@ -507,7 +505,6 @@ class GenericFixtureTest {
         assertNotNull(dummyWithArgsContructors.getComplexType().getInteger());
         assertNotNull(dummyWithArgsContructors.getComplexType().getDouble());
         assertNotNull(dummyWithArgsContructors.getComplexType().getDeepestType().getDeepest());
-
     }
 
     @Test
