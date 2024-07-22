@@ -36,11 +36,11 @@ public class GenerateWithCustomClassTest {
     void testInstantiationOfClassWithGenerateWithCustomMap() {
         //Using CustomMap enforces type-safety within entries
         CustomMap customMap = new CustomMap();
-        customMap.put(String.class, "");
+        customMap.put(String.class, "1");
         customMap.put(Integer.class, 2);
         var result = GenericFixture.generateWithCustomClass(FewAttributes.class, customMap);
-        assertEquals(result.getAtt1(), "");
-        assertEquals(result.getAtt2(), "");
+        assertEquals(result.getAtt1(), "1");
+        assertEquals(result.getAtt2(), "1");
         assertEquals(result.getAtt3(), 2);
         assertEquals(result.getAtt4(), 2);
     }

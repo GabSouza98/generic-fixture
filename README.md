@@ -72,9 +72,10 @@ public static void main(String[] args) {
 
 ## Customized Data Generation
 
+### Custom Fields Map
 It's possible to customize any field during generation.
 
-To do this, it is necessary to use a HashMap whose **key** is the path to the field and the **value** is customized, as shown in the example below.
+To do this, it is necessary to use a Map whose **key** is the path to the field and the **value** is customized, as shown in the example below.
 
 ``` Java
 HashMap<String, Object> customFields = new HashMap<>();
@@ -102,6 +103,43 @@ This way, the Person instance had the fields below customized:
 Needless to say, if the value passed to the key "pet.name" isn't a String, an Exception will be thrown. 
 <br> 
 The Object passed as **value** in the HashMap must be compatible with the expected field type.
+
+### Custom Class's Map
+If you wish to customize fields based on their class, instead of their name path, it's also possible to use a
+Map whose **key** is the Class and the **value** is the object to be used, as shown in the example below.
+``` Java
+public class FewAttributes {
+    private String att1;
+    private String att2;
+    private Integer att3;
+    private Integer att4;
+}
+
+public static void main(String[] args) {
+    FewAttributes result = GenericFixture.generateWithCustomClass(
+        FewAttributes.class, Map.of(String.class, "", Integer.class, 2));
+
+    assertEquals(result.getAtt1(), "1");
+    assertEquals(result.getAtt2(), "1");
+    assertEquals(result.getAtt3(), 2);
+    assertEquals(result.getAtt4(), 2);
+}
+```
+This ensures that every time a class specified in the Map occurs during the fixture instantiation, the **value** 
+object will be set in the field. If you wish to ensure type-safety between Class and Object, it's possible to use the CustomMap.
+``` Java
+public static void main(String[] args) {
+    //Using CustomMap enforces type-safety within entries
+    CustomMap customMap = new CustomMap();
+    customMap.put(String.class, "1");
+    customMap.put(Integer.class, 2);
+    var result = GenericFixture.generateWithCustomClass(FewAttributes.class, customMap);
+    assertEquals(result.getAtt1(), "1");
+    assertEquals(result.getAtt2(), "1");
+    assertEquals(result.getAtt3(), 2);
+    assertEquals(result.getAtt4(), 2);
+}
+```
 
 ## Lists, Maps and Arrays
 
@@ -162,7 +200,69 @@ List<Dummy> fixtures = GenericFixture.generateMany(Dummy.class, <customFields>, 
 ```
 This will generate a List with 3 Dummy objects.
 
-Obs: The third parameter is the number of itens inside iterables, the fourth is the number of fixtures to generate.
+Obs: The third parameter is the number of items inside iterables, the fourth is the number of fixtures to generate.
+
+# Builder Pattern
+Aiming to facilitate the configuration of Fixtures that require a lot of customization, the Builder Pattern
+might be useful to improve readability. It works the same way as the generate() methods combined.
+``` Java
+Person person = GenericFixture.forClass(Person.class)
+    .withCustomFields(Map.of("name", "Jack"))
+    .withCustomClass(Map.of(Integer.class, 2))
+    .withNumberOfIterables(3)
+    .generate();
+```
+As expected, the example above will generate an instance of Person containing the specified value for the "name" field, as well 
+as the Integer classes, and with 3 iterables for the Lists/Maps/Arrays.
+
+**Obs:** if a field is present in the customField's Map, and the field type is present in the customClass's Map, the
+customField's Map value takes precedence. For example, in the example above, if the customClass's Map had an entry 
+(String.class, "John"), the "name" field would still be set to "Jack", and the other String fields would be set to "John".
+
+To generate a List of instances, the process is the same but the finishing method must be generateMany(). The example below 
+will generate a list with 5 Person instances.
+``` Java
+List<Person> personList = GenericFixture.forClass(Person.class)
+    .withCustomFields(Map.of("name", "Jack"))
+    .withCustomClass(Map.of(Integer.class, 2))
+    .withNumberOfIterables(3)
+    .withNumberOfFixtures(5)
+    .generateMany();
+```
+
+### Populating a user-defined object
+It's also possible to use the Builder Pattern to populate a pre-instantiated object. This is useful when the Class which
+needs to be instantiated has a lot of validation logic inside the constructors, making it hard to instantiate with 
+random values without failing a validation.
+
+Since specifying constructor parameters is not yet supported, this approach allows to populate fields which are not
+specified during object construction.
+``` Java
+public class ComplexBusinessLogicConstructor {
+    private String att1;
+    private String att2;
+    private Integer att3;
+    private Integer att4;
+    private String att5;
+
+    public ComplexBusinessLogicConstructor(String att1, String att2, Integer att3, Integer att4) {
+        if (!att1.equals("1")) throw new RuntimeException("Invalid argument");
+        if (!att2.equals("2")) throw new RuntimeException("Invalid argument");
+        if (!att3.equals(3)) throw new RuntimeException("Invalid argument");
+        if (!att4.equals(4)) throw new RuntimeException("Invalid argument");
+
+        this.att1 = att1; this.att2 = att2; this.att3 = att3; this.att4 = att4;
+    }
+}
+
+public static void main(String[] args) {
+    ComplexBusinessLogicConstructor myInstance = new ComplexBusinessLogicConstructor("1", "2", 3, 4);
+    ComplexBusinessLogicConstructor myInstance2 = GenericFixture.forInstance(myInstance).generate();
+
+    assertNotNull(myInstance.getAtt5());
+    assertSame(myInstance, myInstance2); //points to the same object
+}
+```
 
 ## Supported Annotations
 

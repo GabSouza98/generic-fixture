@@ -110,7 +110,12 @@ public final class GenericFixture {
 
     private GenericFixture() {}
 
-    public static class GenericFixtureHelper<T> {
+    /**
+     * Helper class to facilitate fixture configuration using Builder pattern.
+     * To use this class, start with {@link GenericFixture#forClass(Class)} or {@link GenericFixture#forInstance(Object)},
+     * set the desired configuration and finalize calling {@link GenericFixtureBuilder#generate()} or {@link GenericFixtureBuilder#generateMany()}
+     */
+    public static class GenericFixtureBuilder<T> {
         private Class<T> clazz = null;
         private T instance = null;
         private Map<String, Object> customFields = new HashMap<>();
@@ -119,32 +124,79 @@ public final class GenericFixture {
         private Integer numberOfFixtures = 1;
         private Set<Class<?>> visitedClasses = new HashSet<>();
 
-        private GenericFixtureHelper() {}
+        private GenericFixtureBuilder() {}
 
-        public GenericFixtureHelper<T> withCustomFields(Map<String, Object> customFields) {
+        /**
+         * Sets the custom fields Map for the fixture. Works the same way as {@link GenericFixture#generate(Class, Map)}
+         *
+         * @param customFields Map where the key represents the path to a specific attribute which will be set with the map value.
+         * @return Instance of GenericFixtureBuilder for the desired class.
+         */
+        public GenericFixtureBuilder<T> withCustomFields(Map<String, Object> customFields) {
             this.customFields = customFields;
             return this;
         }
 
-        public GenericFixtureHelper<T> withCustomClass(Map<Class<?>, Object> customClass) {
+        /**
+         * Sets the custom class Map for the fixture. Works the same way as {@link GenericFixture#generateWithCustomClass(Class, Map)}
+         *
+         * @param customClass Map where the key represents the class which will be set with the map value.
+         * @return Instance of GenericFixtureBuilder for the desired class.
+         */
+        public GenericFixtureBuilder<T> withCustomClass(Map<Class<?>, Object> customClass) {
             this.customClass = customClass;
             return this;
         }
 
-        public GenericFixtureHelper<T> withNumberOfItems(Integer numberOfItems) {
-            this.numberOfItems = numberOfItems;
+        /**
+         * Sets the CustomMap for the fixture. Works the same way as {@link GenericFixture#generateWithCustomClass(Class, CustomMap)}
+         *
+         * @param customMap Map where the key represents the class which will be set with the map value.
+         * @return Instance of GenericFixtureBuilder for the desired class.
+         */
+        public GenericFixtureBuilder<T> withCustomClass(CustomMap customMap) {
+            this.customClass = customMap.getMap();
             return this;
         }
 
-        public GenericFixtureHelper<T> withNumberOfFixtures(Integer numberOfFixtures) {
+        /**
+         * Sets the number of iterables to be generated within the fixture. Works the same way as {@link GenericFixture#generate(Class, Integer)}
+         *
+         * @param numberOfIterables Number of iterables to be inserted in each Collection or Array field of the class.
+         * @return Instance of GenericFixtureBuilder for the desired class.
+         */
+        public GenericFixtureBuilder<T> withNumberOfIterables(Integer numberOfIterables) {
+            this.numberOfItems = numberOfIterables;
+            return this;
+        }
+
+        /**
+         * Sets the number of fixtures to be generated. Works the same way as {@link GenericFixture#generateMany(Class, Integer)}
+         *
+         * @param numberOfFixtures Number of fixtures to generate.
+         * @return Instance of GenericFixtureBuilder for the desired class.
+         */
+        public GenericFixtureBuilder<T> withNumberOfFixtures(Integer numberOfFixtures) {
             this.numberOfFixtures = numberOfFixtures;
             return this;
         }
 
+        /**
+         * Finishes the builder setup and generates the instance with the current configuration. Similar to calling
+         * {@link GenericFixture#generate(Class, Map, Integer)} with all parameters.
+         *
+         * @return Instance of the desired class.
+         */
         public T generate() {
             return doGenerate(instance, clazz, customFields, customClass, "", numberOfItems, visitedClasses);
         }
 
+        /**
+         * Finishes the builder setup and generates a list of instances with the current configuration. Similar to calling
+         * {@link GenericFixture#generateMany(Class, Map, Integer, Integer)} with all parameters.
+         *
+         * @return List of instances of the desired class.
+         */
         public List<T> generateMany() {
             List<T> list = new ArrayList<>();
             for (int i = 0; i < numberOfFixtures; i++) {
@@ -154,17 +206,29 @@ public final class GenericFixture {
         }
     }
 
-    public static <T> GenericFixtureHelper<T> forClass(Class<T> clazz) {
-        GenericFixtureHelper<T> genericFixtureHelper = new GenericFixtureHelper<>();
-        genericFixtureHelper.clazz = clazz;
-        return genericFixtureHelper;
+    /**
+     * Starts the builder pattern to generate an instance of the specified class.
+     *
+     * @param clazz Class to instantiate.
+     * @return Instance of GenericFixtureBuilder for the desired class.
+     */
+    public static <T> GenericFixtureBuilder<T> forClass(Class<T> clazz) {
+        GenericFixtureBuilder<T> genericFixtureBuilder = new GenericFixtureBuilder<>();
+        genericFixtureBuilder.clazz = clazz;
+        return genericFixtureBuilder;
     }
 
-    public static <T> GenericFixtureHelper<T> forInstance(T instance) {
-        GenericFixtureHelper<T> genericFixtureHelper = new GenericFixtureHelper<>();
-        genericFixtureHelper.instance = instance;
-        genericFixtureHelper.clazz = (Class<T>) instance.getClass();
-        return genericFixtureHelper;
+    /**
+     * Starts the builder pattern to populate the specified instance.
+     *
+     * @param instance Instance to populate.
+     * @return Instance of GenericFixtureBuilder for the desired class.
+     */
+    public static <T> GenericFixtureBuilder<T> forInstance(T instance) {
+        GenericFixtureBuilder<T> genericFixtureBuilder = new GenericFixtureBuilder<>();
+        genericFixtureBuilder.instance = instance;
+        genericFixtureBuilder.clazz = (Class<T>) instance.getClass();
+        return genericFixtureBuilder;
     }
 
     private static final SecureRandom random = new SecureRandom();
@@ -220,10 +284,74 @@ public final class GenericFixture {
         return doGenerate(null, clazz, customFields, new HashMap<>(), "", 1, new HashSet<>());
     }
 
+    /**
+     * Generates an instance of the specified class populated with random values, and populates specific classes with user defined instances.
+     *
+     * <pre>{@code
+     *     public class FewAttributes {
+     *         private String att1;
+     *         private String att2;
+     *         private Integer att3;
+     *         private Integer att4;
+     *     }
+     *
+     *     public static void main(String[] args) {
+     *         Map<Class<?>, Object> customMap = new HashMap<>();
+     *         customMap.put(String.class, "1");
+     *         customMap.put(Integer.class, 2);
+     *
+     *         FewAttributes result = GenericFixture.forClass(FewAttributes.class)
+     *                 .withCustomClass(customMap)
+     *                 .generate();
+     *
+     *         assertEquals(result.getAtt1(), "1");
+     *         assertEquals(result.getAtt2(), "1");
+     *         assertEquals(result.getAtt3(), 2);
+     *         assertEquals(result.getAtt4(), 2);
+     *     }
+     * }</pre>
+     *
+     * @param clazz Class to instantiate.
+     * @param customClass Map where the key represents the class which will be set with the map value.
+     * @return Instance of the desired class with custom classes defined. Classes not present in the map will still be
+     * randomly populated.
+     */
     public static <T> T generateWithCustomClass(Class<T> clazz, Map<Class<?>, Object> customClass) {
         return doGenerate(null, clazz, new HashMap<>(), customClass, "", 1, new HashSet<>());
     }
 
+    /**
+     * Generates an instance of the specified class populated with random values, and populates specific classes with user defined instances.
+     *
+     * <pre>{@code
+     *     public class FewAttributes {
+     *         private String att1;
+     *         private String att2;
+     *         private Integer att3;
+     *         private Integer att4;
+     *     }
+     *
+     *     public static void main(String[] args) {
+     *         CustomMap customMap = new CustomMap();
+     *         customMap.put(String.class, "1");
+     *         customMap.put(Integer.class, 2);
+     *
+     *         FewAttributes result = GenericFixture.forClass(FewAttributes.class)
+     *                 .withCustomClass(customMap)
+     *                 .generate();
+     *
+     *         assertEquals(result.getAtt1(), "1");
+     *         assertEquals(result.getAtt2(), "1");
+     *         assertEquals(result.getAtt3(), 2);
+     *         assertEquals(result.getAtt4(), 2);
+     *     }
+     * }</pre>
+     *
+     * @param clazz Class to instantiate.
+     * @param customClass Map where the key represents the class which will be set with the map value.
+     * @return Instance of the desired class with custom classes defined. Classes not present in the map will still be
+     * randomly populated.
+     */
     public static <T> T generateWithCustomClass(Class<T> clazz, CustomMap customClass) {
         return doGenerate(null, clazz, new HashMap<>(), customClass.getMap(), "", 1, new HashSet<>());
     }

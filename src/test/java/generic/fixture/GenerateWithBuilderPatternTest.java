@@ -16,7 +16,7 @@ public class GenerateWithBuilderPatternTest {
         FewAttributes result = GenericFixture.forClass(FewAttributes.class)
                 .withCustomFields(Map.of("att2", "custom"))
                 .withCustomClass(Map.of(Integer.class, 2))
-                .withNumberOfItems(3)
+                .withNumberOfIterables(3)
                 .generate();
 
         assertNotNull(result.getAtt1());
@@ -37,6 +37,22 @@ public class GenerateWithBuilderPatternTest {
     }
 
     @Test
+    void testGenerateWithBuilderPatternAndCustomMap() {
+        CustomMap customMap = new CustomMap();
+        customMap.put(String.class, "1");
+        customMap.put(Integer.class, 2);
+
+        FewAttributes result = GenericFixture.forClass(FewAttributes.class)
+                .withCustomClass(customMap)
+                .generate();
+
+        assertEquals(result.getAtt1(), "1");
+        assertEquals(result.getAtt2(), "1");
+        assertEquals(result.getAtt3(), 2);
+        assertEquals(result.getAtt4(), 2);
+    }
+
+    @Test
     void testGenerateWithBuilderPatternGenerateWithDefaultItems() {
         FewAttributes result = GenericFixture.forClass(FewAttributes.class).generate();
 
@@ -46,7 +62,7 @@ public class GenerateWithBuilderPatternTest {
     @Test
     void testGenerateWithBuilderPatternGenerateWithCustomItems() {
         FewAttributes result = GenericFixture.forClass(FewAttributes.class)
-                .withNumberOfItems(3)
+                .withNumberOfIterables(3)
                 .generate();
 
         assertEquals(3, result.getDoubleList().size());
@@ -67,6 +83,7 @@ public class GenerateWithBuilderPatternTest {
         List<FewAttributes> result = GenericFixture.forClass(FewAttributes.class)
                 .withCustomFields(Map.of("att2", "FIELD"))
                 .withCustomClass(Map.of(String.class, "CLASS"))
+                .withNumberOfIterables(5)
                 .withNumberOfFixtures(3)
                 .generateMany();
 
