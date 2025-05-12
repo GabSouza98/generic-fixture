@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.Future;
+import jakarta.validation.constraints.Future;
 import java.time.LocalDateTime;
 
 @Getter

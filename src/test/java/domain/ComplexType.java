@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.Negative;
+import jakarta.validation.constraints.Negative;
 
 @Getter
 @Setter
