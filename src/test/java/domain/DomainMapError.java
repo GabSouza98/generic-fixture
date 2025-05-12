@@ -20,5 +20,4 @@ public class DomainMapError {
 
     private TreeMap<ComplexType, Integer>[] treeMapComplexTypeInteger;
 
-
 }
