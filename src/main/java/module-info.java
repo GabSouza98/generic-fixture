@@ -2,6 +2,6 @@ module GenericFixture {
     requires org.apache.commons.lang3;
     requires rgxgen;
     requires lombok;
-    requires java.validation;
+    requires jakarta.validation;
     exports generic.fixture;
 }
